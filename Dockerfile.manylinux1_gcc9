@@ -33,9 +33,9 @@ RUN mkdir /home/spack/mirror
 RUN ${SPACK_CMD} mirror create -d /home/spack/mirror -D gcc@9.3.0 && \
     ${SPACK_CMD} mirror add mirror file:///home/spack/mirror
 
-RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install --only=dependencies gcc@9.3.0 && \
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install --only=dependencies gcc@9.3.0 target=x86_64 && \
     ${SPACK_CMD} clean -a
-RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install -v gcc@9.3.0 && ${SPACK_CMD} clean -a
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install -v gcc@9.3.0 target=x86_64 && ${SPACK_CMD} clean -a
 
 # Register the compiler and move itout of the platform scope
 RUN ${SPACK_CMD} compiler add $(${SPACK_CMD} location -i gcc) && \
