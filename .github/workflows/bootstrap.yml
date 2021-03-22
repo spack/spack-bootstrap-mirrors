@@ -10,6 +10,7 @@ on:
 
 jobs:
   manylinux_gcc:
+    runs-on: ubuntu-latest
     env:
       PLATFORM: x86_64
       COMMIT_SHA: ${{ github.sha }}
