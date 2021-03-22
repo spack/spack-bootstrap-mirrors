@@ -25,7 +25,7 @@ RUN /opt/python/cp39-cp39/bin/pip install cmake
 RUN git clone https://www.github.com/spack/spack.git
 
 # Install tar since the once that ships with CentOS 5 can't handle .xz archives
-RUN ${SPACK_CMD} install tar 
+RUN ${SPACK_CMD} install tar target=x86_64 
 
 # GCC 9.3.1 is installed on manylinux2014
 RUN mkdir /home/spack/mirror
