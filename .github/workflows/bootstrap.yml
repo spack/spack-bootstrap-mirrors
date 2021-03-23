@@ -108,10 +108,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ manylinux1_mirrors ]
     steps:
-    - uses: actions/checkout@v2
-    - run: |
-      . ./copy_mirror.sh
-    - uses: actions/upload-artifact@v2
-      with:
-        name: clingo_linux_x86_64
-        path: binary-mirror
+      - uses: actions/checkout@v2
+      - run: |
+          . ./copy_mirror.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: clingo_linux_x86_64
+          path: binary-mirror
