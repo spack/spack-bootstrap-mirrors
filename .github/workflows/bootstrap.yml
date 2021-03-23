@@ -109,9 +109,9 @@ jobs:
     needs: [ manylinux1_mirrors ]
     container: 
     steps:
+    - uses: actions/checkout@v2
     - run: |
-      docker pull ghcr.io/alalazo/manylinux1_mirrors_x86_64:latest
-      docker cp $(docker create ghcr.io/alalazo/manylinux1_mirrors_x86_64:latest):/home/spack/binary-mirror binary-mirror
+      . ./copy_mirror.sh
     - uses: actions/upload-artifact@v2
       with:
         name: clingo_linux_x86_64
