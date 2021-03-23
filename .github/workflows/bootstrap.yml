@@ -107,9 +107,14 @@ jobs:
   upload_clingo:
     runs-on: ubuntu-latest
     needs: [ manylinux1_mirrors ]
-    container: ghcr.io/alalazo/manylinux1_mirrors_x86_64:latest
+    container: 
     steps:
+    - run: |
+      docker pull ghcr.io/alalazo/manylinux1_mirrors_x86_64:latest
+      id=$(docker create ghcr.io/alalazo/manylinux1_mirrors_x86_64:latest)
+      docker cp $id:/home/spack/binary-mirror binary-mirror
+      docker rm -v $id
     - uses: actions/upload-artifact@v2
       with:
         name: clingo_linux_x86_64
-        path: /home/spack/binary-mirror
+        path: binary-mirror
