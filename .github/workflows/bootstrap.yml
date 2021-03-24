@@ -70,7 +70,7 @@ jobs:
 
   manylinux1_mirrors:
     runs-on: ubuntu-latest
-    needs: [ manylinux_gcc ]
+    needs: [ changes, manylinux_gcc ]
     env:
       PLATFORM: x86_64
       COMMIT_SHA: ${{ github.sha }}
