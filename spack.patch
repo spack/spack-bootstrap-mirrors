@@ -1,6 +1,8 @@
+diff --git a/lib/spack/spack/relocate.py b/lib/spack/spack/relocate.py
+index e167472b75..c04a026c8a 100644
 --- a/lib/spack/spack/relocate.py
 +++ b/lib/spack/spack/relocate.py
-@@ -987,7 +987,7 @@ def mime_type(filename):
+@@ -987,10 +987,15 @@ def mime_type(filename):
      """
      file_cmd = executable.Executable('file')
      output = file_cmd(
@@ -9,3 +11,11 @@
      tty.debug('[MIME_TYPE] {0} -> {1}'.format(filename, output.strip()))
      # In corner cases the output does not contain a subtype prefixed with a /
      # In those cases add the / so the tuple can be formed.
++    for sep in (',', ';'):
++        idx = output.find(',')
++        if idx != -1:
++            output = output[:idx]
++
+     if '/' not in output:
+         output += '/'
+     split_by_slash = output.strip().split('/')

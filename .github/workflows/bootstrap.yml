@@ -31,6 +31,7 @@ jobs:
           manylinux1_mirrors:
           - './Dockerfile.manylinux1_mirrors'
           - './create_binary_mirror.sh'
+	  - './spack.patch'
 
   manylinux_gcc:
     runs-on: ubuntu-latest
