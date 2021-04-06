@@ -129,6 +129,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: |
           git clone https://github.com/spack/spack.git
-          cd spack
-          . share/spack/setup-env.sh
+          . spack/share/spack/setup-env.sh
           spack python install_clingo.py
+          mkdir -p binary-mirror
+          spack buildcache create -d $PWD/binary-mirror -a -u -f clingo-bootstrap
+      - uses: actions/upload-artifact@v2
+        with:
+          name: clingo_linux_x86_64
+          path: binary-mirror
