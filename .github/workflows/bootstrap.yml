@@ -129,8 +129,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: |
+          brew install bison
           git clone https://github.com/spack/spack.git
           . spack/share/spack/setup-env.sh
+          spack external find --not-buildable cmake bison
           spack python install_clingo.py
           mkdir -p binary-mirror
           spack buildcache create -d $PWD/binary-mirror -a -u -f clingo-bootstrap
