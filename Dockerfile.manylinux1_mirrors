@@ -1,7 +1,7 @@
 FROM ghcr.io/alalazo/manylinux1_gcc9_x86_64:latest
 
-# Move to a temporary branch with enhancements on the bootstrapping procedure
-RUN cd spack && git fetch origin pull/22354/merge:PR/22354 && git checkout PR/22354
+# Pull the current head of develop
+RUN cd spack && git checkout develop && git pull
 
 # Run a script to build all the versions of clingo we could
 COPY --chown=spack:spack bootstrap_clingo.sh /home/spack/bootstrap_clingo.sh
