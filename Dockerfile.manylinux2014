@@ -1,0 +1,25 @@
+FROM ghcr.io/alalazo/manylinux2014:latest
+
+RUN adduser -m spack
+
+# Switch to a non-root user
+USER spack
+ENV SPACK_CMD="/opt/python/cp39-cp39/bin/python /home/spack/spack/bin/spack"
+WORKDIR /home/spack
+
+# Clone the repo and install Spack
+RUN git clone https://www.github.com/spack/spack.git
+
+# Run a script to build all the versions of clingo we could
+COPY --chown=spack:spack bootstrap_clingo2014.sh /home/spack/bootstrap_clingo2014.sh
+COPY --chown=spack:spack install_clingo.py /home/spack/install_clingo.py
+COPY --chown=spack:spack create_binary_mirror.sh /home/spack/create_binary_mirror.sh
+COPY --chown=spack:spack spack2014.patch /home/spack/spack/spack.patch
+
+RUN cd spack && git apply spack.patch
+
+# Set externals, locate compilers
+RUN ${SPACK_CMD} external find --not-buildable cmake bison 
+RUN ${SPACK_CMD} compiler find
+
+RUN ${HOME}/bootstrap_clingo2014.sh
