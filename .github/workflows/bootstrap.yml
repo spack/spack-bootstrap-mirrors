@@ -197,5 +197,4 @@ jobs:
         with:
           name: clingo_binary_mirror
           path: |
-            arm64/binary-mirror
-            ppc64le/binary-mirror
+            binary-mirror

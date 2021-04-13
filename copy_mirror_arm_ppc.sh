@@ -9,3 +9,10 @@ id=$(docker create --platform linux/ppc64le ghcr.io/alalazo/manylinux2014_mirror
 mkdir ppc64le
 docker cp $id:/home/spack/binary-mirror ppc64le/binary-mirror
 docker rm -v $id
+
+# Unify the two mirrors. This is required since the upload-artifacts action
+# computes the common ancestore among different paths and starts from there
+# instead of "merging" the copies
+mkdir binary-mirror
+rsync -a ./arm64/binary-mirror/ ./binary-mirror
+rsync -a ./ppc64le/binary-mirror/ ./binary-mirror
