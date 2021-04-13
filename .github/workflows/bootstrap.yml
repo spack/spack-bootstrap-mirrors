@@ -211,7 +211,7 @@ jobs:
         with:
           name: clingo_binary_mirror
       - run: |
-          ls -R
+          pip install ruamel.yaml
           python clingo_json.py
       - uses: actions/upload-artifact@v2
         with:
