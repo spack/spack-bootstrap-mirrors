@@ -177,7 +177,7 @@ jobs:
       # Build and eventually push to registry
       - uses: docker/build-push-action@v2
         # Build and push only if the Dockerfile changed
-        # if: ${{ needs.changes.outputs.manylinux2014 == 'true' }}
+        if: ${{ needs.changes.outputs.manylinux2014 == 'true' }}
         with:
           file: ./Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le
