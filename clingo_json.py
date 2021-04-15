@@ -20,6 +20,9 @@ SPEC_INFO = {
     ('rhel5', 'x86_64'): {
         'spec': 'clingo-bootstrap%gcc platform=linux target=x86_64',
     },
+    ('centos6', 'x86_64'): {
+        'spec': 'clingo-bootstrap%gcc platform=linux target=x86_64',
+    },
     ('centos7', 'aarch64'): {
         'spec': 'clingo-bootstrap%gcc platform=linux target=aarch64',
     },
