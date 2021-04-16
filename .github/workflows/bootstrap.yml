@@ -16,6 +16,7 @@ jobs:
       manylinux1_gcc: ${{ steps.filter.outputs.manylinux1_gcc }}
       manylinux1_mirrors: ${{ steps.filter.outputs.manylinux1_mirrors }}
       manylinux2014: ${{ steps.filter.outputs.manylinux2014 }}
+      centos6: ${{ steps.filter.outputs.centos6 }}
     steps:
     - uses: actions/checkout@v2
       if: ${{ github.event_name == 'push' }}
@@ -37,6 +38,9 @@ jobs:
           - './Dockerfile.manylinux2014'
           - './create_binary_mirror.sh'
           - './spack2014.patch'
+          centos6:
+          - './Dockerfile.centos6'
+          - './centos6/*'
 
   manylinux_gcc:
     runs-on: ubuntu-latest
@@ -225,7 +229,7 @@ jobs:
 
       # Build and eventually push to registry
       - uses: docker/build-push-action@v2
-        # if: ${{ needs.changes.outputs.manylinux1_mirrors == 'true' }}
+        if: ${{ needs.changes.outputs.centos6 == 'true' }}
         with:
           file: ./Dockerfile.centos6
           platforms: linux/amd64
