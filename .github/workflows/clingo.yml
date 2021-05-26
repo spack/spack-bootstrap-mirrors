@@ -1,4 +1,4 @@
-name: Bootstrap
+name: clingo
 
 on:
   push:
@@ -37,7 +37,6 @@ jobs:
           manylinux2014:
           - './Dockerfile.manylinux2014'
           - './create_binary_mirror.sh'
-          - './spack2014.patch'
           centos6:
           - './Dockerfile.centos6'
           - './centos6/*'

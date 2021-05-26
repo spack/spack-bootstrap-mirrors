@@ -1,8 +1,8 @@
 diff --git a/lib/spack/external/archspec/cpu/detect.py b/lib/spack/external/archspec/cpu/detect.py
-index e65076c788..9fcc268d69 100644
+index 4fe343de8c..0051e1bf2f 100644
 --- a/lib/spack/external/archspec/cpu/detect.py
 +++ b/lib/spack/external/archspec/cpu/detect.py
-@@ -228,7 +228,10 @@ def compatibility_check_for_power(info, target):
+@@ -240,7 +240,10 @@ def compatibility_check_for_power(info, target):
      """Compatibility check for PPC64 and PPC64LE architectures."""
      basename = platform.machine()
      generation_match = re.search(r"POWER(\d+)", info.get("cpu", ""))
@@ -15,10 +15,10 @@ index e65076c788..9fcc268d69 100644
      # We can use a target if it descends from our machine type and our
      # generation (9 for POWER9, etc) is at least its generation.
 diff --git a/lib/spack/spack/architecture.py b/lib/spack/spack/architecture.py
-index ba2d824010..17704d6f68 100644
+index 04cd85be49..b90e611595 100644
 --- a/lib/spack/spack/architecture.py
 +++ b/lib/spack/spack/architecture.py
-@@ -67,9 +67,9 @@
+@@ -66,9 +66,9 @@
  import llnl.util.tty as tty
  import llnl.util.lang as lang
  
@@ -31,7 +31,7 @@ index ba2d824010..17704d6f68 100644
  import spack.paths
  import spack.error as serr
  import spack.util.executable
-@@ -604,6 +604,8 @@ def __call__(self):
+@@ -588,6 +588,8 @@ def __call__(self):
  def use_platform(new_platform):
      global platform, all_platforms
  
@@ -41,19 +41,18 @@ index ba2d824010..17704d6f68 100644
      assert isinstance(new_platform, Platform), msg.format(new_platform)
  
 diff --git a/lib/spack/spack/compilers/__init__.py b/lib/spack/spack/compilers/__init__.py
-index 83503f09ed..8663f24743 100644
+index 817d21add6..e43380e2b2 100644
 --- a/lib/spack/spack/compilers/__init__.py
 +++ b/lib/spack/spack/compilers/__init__.py
-@@ -23,7 +23,7 @@
+@@ -23,7 +23,6 @@
  import spack.spec
  import spack.config
  import spack.compiler
 -import spack.architecture
-+#import spack.architecture
- import spack.util.imp as simp
+ 
  from spack.util.environment import get_path
  from spack.util.naming import mod_to_class
-@@ -495,6 +495,7 @@ def all_os_classes():
+@@ -494,6 +493,7 @@ def all_os_classes():
      Return the list of classes for all operating systems available on
      this platform
      """
@@ -62,7 +61,7 @@ index 83503f09ed..8663f24743 100644
  
      platform = spack.architecture.platform()
 diff --git a/lib/spack/spack/config.py b/lib/spack/spack/config.py
-index 63839cfb05..5f22568e57 100644
+index 574902f508..af1f07290a 100644
 --- a/lib/spack/spack/config.py
 +++ b/lib/spack/spack/config.py
 @@ -48,8 +48,8 @@
