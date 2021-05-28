@@ -1,0 +1,26 @@
+diff --git a/var/spack/repos/builtin/packages/gnupg/package.py b/var/spack/repos/builtin/packages/gnupg/package.py
+index 2a602d8eff..a420ccb5b7 100644
+--- a/var/spack/repos/builtin/packages/gnupg/package.py
++++ b/var/spack/repos/builtin/packages/gnupg/package.py
+@@ -56,6 +56,8 @@ def configure_args(self):
+             '--disable-gnutls',
+             '--disable-ldap',
+             '--disable-regex',
++            '--disable-nls',
++            '--without-libintl-prefix',
+             '--with-pinentry-pgm='        + self.spec['pinentry'].command.path,
+             '--with-libgpg-error-prefix=' + self.spec['libgpg-error'].prefix,
+             '--with-libgcrypt-prefix='    + self.spec['libgcrypt'].prefix,
+diff --git a/var/spack/repos/builtin/packages/libgpg-error/package.py b/var/spack/repos/builtin/packages/libgpg-error/package.py
+index 2083e2e61e..0de1a018f0 100644
+--- a/var/spack/repos/builtin/packages/libgpg-error/package.py
++++ b/var/spack/repos/builtin/packages/libgpg-error/package.py
+@@ -31,5 +31,7 @@ def configure_args(self):
+         return [
+             '--enable-static',
+             '--enable-shared',
+-            '--enable-tests' if self.run_tests else '--disable-tests'
++            '--enable-tests' if self.run_tests else '--disable-tests',
++            '--without-libintl-prefix',
++            '--disable-nls'
+         ]

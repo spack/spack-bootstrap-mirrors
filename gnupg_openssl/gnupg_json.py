@@ -23,7 +23,7 @@ SPEC_INFO = {
         'spec': 'gnupg@2.3: %gcc platform=linux target=aarch64',
     },
     ('centos7', 'ppc64le'): {
-        'spec': 'gnupg@2.3: gcc platform=linux target=ppc64le',
+        'spec': 'gnupg@2.3: %gcc platform=linux target=ppc64le',
     },
     ('catalina', 'x86_64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=x86_64',        
