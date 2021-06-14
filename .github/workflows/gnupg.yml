@@ -27,11 +27,12 @@ jobs:
         # See https://github.com/dorny/paths-filter/issues/56 for the syntax used below
         filters: |
           x86_64:
-          - './gnupg_openssl/Dockerfile.x86_64'
-          - './gnupg_openssl/gnupg.patch'
+          - './gnupg/Dockerfile.x86_64'
+          - './gnupg/patches/gnupg_rhel5.patch'
+          - './spack/patches/spack_rhel5.patch'
           arm64ppc64le:
-          - './gnupg_openssl/Dockerfile.manylinux2014'
-          - './spack2014.patch'
+          - './gnupg/Dockerfile.manylinux2014'
+          - './spack/patches/spack_buildx.patch'
 
   x86_64_mirrors:
     runs-on: ubuntu-latest
@@ -47,7 +48,7 @@ jobs:
       - uses: crazy-max/ghaction-docker-meta@v1
         id: docker_meta
         with:
-          images: ghcr.io/${{ github.repository_owner }}/gnupg_openssl_x86_64
+          images: ghcr.io/${{ github.repository_owner }}/gnupg_x86_64
 
       # Login to Github Packages
       - uses: docker/login-action@v1
@@ -62,11 +63,11 @@ jobs:
       - uses: docker/build-push-action@v2
         if: ${{ needs.changes.outputs.x86_64 == 'true' }}
         with:
-          file: ./gnupg_openssl/Dockerfile.x86_64
+          file: ./gnupg/Dockerfile.x86_64
           platforms: linux/amd64
           pull: ${{ github.event_name == 'pull_request' }}
           push: true
-          tags: ghcr.io/alalazo/gnupg_openssl_x86_64:latest
+          tags: ghcr.io/alalazo/gnupg_x86_64:latest
           labels: ${{ steps.docker_meta.outputs.labels }}
   
   upload-x86-64:
@@ -75,7 +76,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          . ./gnupg_openssl/copy_mirror_x86_64.sh
+          . ./gnupg/scripts/copy_mirror_x86_64.sh
       - uses: actions/upload-artifact@v2
         with:
           name: gnupg_binary_mirror
@@ -88,22 +89,21 @@ jobs:
       - uses: actions/setup-python@v2
       - run: |
           brew install gawk perl
-          git clone https://github.com/spack/spack.git
+          git clone https://github.com/spack/spack.git spack-src
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          cd spack && git apply ../gnupg_openssl/gnupg_no_nls.patch && cd ..
+          cd spack-src && git apply ../gnupg/patches/gnupg_macos.patch && cd ..
           
-          . spack/share/spack/setup-env.sh
+          . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:128"
           mkdir -p binary-mirror
+
+          # Inject flags to have compatibility with MacOSX version 10.13 or higher
           spack install gnupg cflags="-mmacosx-version-min=10.13" target=x86_64
           spack buildcache create -d $PWD/binary-mirror -a -u -f gnupg
-          # Uncomment if we need OpenSSL
-          # spack install openssl cflags="-mmacosx-version-min=10.13" target=x86_64
-          # spack buildcache create -d $PWD/binary-mirror -a -u -f openssl
       - uses: actions/upload-artifact@v2
         with:
           name: gnupg_binary_mirror
@@ -120,7 +120,7 @@ jobs:
       - uses: crazy-max/ghaction-docker-meta@v1
         id: docker_meta
         with:
-          images: ghcr.io/${{ github.repository_owner }}/gnupg_openssl_manylinux2014
+          images: ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014
 
       # Login to Github Packages
       - uses: docker/login-action@v1
@@ -141,11 +141,11 @@ jobs:
         # Build and push only if the Dockerfile changed
         if: ${{ needs.changes.outputs.arm64ppc64le == 'true' }}
         with:
-          file: ./gnupg_openssl/Dockerfile.manylinux2014
+          file: ./gnupg/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le
           pull: ${{ github.event_name == 'pull_request' }}
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/gnupg_openssl_manylinux2014:latest
+          tags: ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014:latest
           labels: ${{ steps.docker_meta.outputs.labels }}
 
   upload-arm64-ppc64le:
@@ -154,7 +154,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          . ./gnupg_openssl/copy_mirror_arm_ppc.sh
+          . ./gnupg/scripts/copy_mirror_arm_ppc.sh
       - uses: actions/upload-artifact@v2
         with:
           name: gnupg_binary_mirror
@@ -174,7 +174,7 @@ jobs:
           name: gnupg_binary_mirror
       - run: |
           pip install ruamel.yaml
-          python gnupg_openssl/gnupg_json.py
+          python gnupg/scripts/gnupg_json.py
       - uses: actions/upload-artifact@v2
         with:
           name: gnupg_manifest

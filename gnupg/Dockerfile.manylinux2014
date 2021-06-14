@@ -10,7 +10,7 @@ WORKDIR /home/spack
 # Clone the repo and install Spack
 RUN git clone https://www.github.com/spack/spack.git
 
-COPY --chown=spack:spack spack2014.patch /home/spack/spack/spack.patch
+COPY --chown=spack:spack spack/patches/spack_buildx.patch /home/spack/spack/spack.patch
 RUN cd spack && git apply spack.patch
 
 # Set externals, locate compilers
@@ -19,8 +19,6 @@ RUN ${SPACK_CMD} compiler find
 
 RUN ${SPACK_CMD} python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
 RUN ${SPACK_CMD} -c  "config:install_tree:padded_length:128" install gnupg target=$(cat target.txt)
-# Uncomment if we need OpenSSL
-# RUN ${SPACK_CMD} -c  "config:install_tree:padded_length:128" install openssl target=$(cat target.txt)
 
 RUN mkdir -p /home/spack/binary-mirror && \
     ${SPACK_CMD} -c  "config:install_tree:padded_length:128" buildcache create -d /home/spack/binary-mirror -a -u -f gnupg target=$(cat target.txt)

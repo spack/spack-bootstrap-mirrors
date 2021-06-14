@@ -124,8 +124,6 @@ for spec_yaml in spec_yaml_files:
     )
     mirror_entry = {
         "spec": SPEC_INFO[(current_os, current_target)]['spec'],
-        #"hash": current_hash,
-        #"sha256": shas[current_hash],
         "binaries": binaries,
         "compiler": compiler_entry(compiler_name, compiler_version, current_os, current_target) 
     }

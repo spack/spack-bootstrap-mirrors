@@ -139,8 +139,8 @@ jobs:
       - run: |
           brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
-          git clone https://github.com/spack/spack.git
-          . spack/share/spack/setup-env.sh
+          git clone https://github.com/spack/spack.git spack-src
+          . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
           spack python install_clingo.py
           mkdir -p binary-mirror
