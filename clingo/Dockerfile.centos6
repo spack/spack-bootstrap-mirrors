@@ -14,12 +14,12 @@ RUN spack load gcc && spack compiler find
 # Install clingo and patch pyclingo.cc to include
 # capsulethunk.h (to ensure portability with Python2.6)
 COPY install_clingo.py install_clingo.py
-COPY centos6/package.py /opt/spack/var/spack/repos/builtin/packages/clingo-bootstrap/
-COPY centos6/capsulethunk.h /opt/spack/var/spack/repos/builtin/packages/clingo-bootstrap/
-COPY centos6/pyclingo.cc /opt/spack/var/spack/repos/builtin/packages/clingo-bootstrap/
+COPY clingo/patches/centos6/package.py /opt/spack/var/spack/repos/builtin/packages/clingo-bootstrap/
+COPY clingo/patches/centos6/capsulethunk.h /opt/spack/var/spack/repos/builtin/packages/clingo-bootstrap/
+COPY clingo/patches/centos6/pyclingo.cc /opt/spack/var/spack/repos/builtin/packages/clingo-bootstrap/
 
 RUN spack python install_clingo.py
 
 # Create the binary mirror
-COPY centos6/create_binary_mirror.sh create_binary_mirror.sh
+COPY clingo/scripts/centos6/create_binary_mirror.sh create_binary_mirror.sh
 RUN bash create_binary_mirror.sh
