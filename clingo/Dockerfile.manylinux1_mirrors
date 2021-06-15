@@ -1,0 +1,13 @@
+FROM ghcr.io/alalazo/manylinux1_gcc9_x86_64:latest
+
+# Pull the current head of develop
+RUN cd spack && git checkout develop && git pull
+
+# Run a script to build all the versions of clingo we could
+COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux1.sh /home/spack/bootstrap_clingo.sh
+COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
+COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
+COPY --chown=spack:spack clingo/patches/spack_manylinux1.patch /home/spack/spack/spack.patch
+
+RUN cd spack && git apply spack.patch
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${HOME}/bootstrap_clingo.sh

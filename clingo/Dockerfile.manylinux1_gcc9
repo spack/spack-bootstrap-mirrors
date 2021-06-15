@@ -16,7 +16,7 @@ ENV SPACK_CMD="/opt/python/cp39-cp39/bin/python /home/spack/spack/bin/spack"
 WORKDIR /home/spack
 
 # Use gettext and cmake as externals
-COPY --chown=spack:spack packages.yaml /home/spack/.spack/packages.yaml
+COPY --chown=spack:spack clingo/packages.yaml /home/spack/.spack/packages.yaml
 
 # Install CMake
 RUN /opt/python/cp39-cp39/bin/pip install cmake
@@ -37,6 +37,6 @@ RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install --only=d
     ${SPACK_CMD} clean -a
 RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install -v gcc@9.3.0 target=x86_64 && ${SPACK_CMD} clean -a
 
-# Register the compiler and move itout of the platform scope
+# Register the compiler and move it out of the platform scope
 RUN ${SPACK_CMD} compiler add $(${SPACK_CMD} location -i gcc) && \
     cp /home/spack/.spack/linux/compilers.yaml /home/spack/.spack/compilers.yaml
