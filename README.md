@@ -89,6 +89,8 @@ This ultimately emulates the architectures using
 [QEMU](https://www.qemu.org)
 which on the one hand permits to build artifacts seamlessly,
 but on the other results in very slow builds that for `clingo` exceed the 6hrs granted by Github.
+**Because of this at the moment the `ppc64le` and `aarch64le` binaries have been generated on a local 
+machine and pushed to ghcr.io**.
 
 ### `clingo` specific caveats
 
