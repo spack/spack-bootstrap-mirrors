@@ -7,7 +7,7 @@ RUN cd spack && git checkout develop && git pull
 COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux1.sh /home/spack/bootstrap_clingo.sh
 COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
 COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
-COPY --chown=spack:spack clingo/patches/spack_manylinux1.patch /home/spack/spack/spack.patch
+COPY --chown=spack:spack spack/patches/spack_rhel5.patch /home/spack/spack/spack.patch
 
 RUN cd spack && git apply spack.patch
 RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${HOME}/bootstrap_clingo.sh

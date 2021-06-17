@@ -35,12 +35,14 @@ jobs:
           - './clingo/Dockerfile.manylinux1_mirrors'
           - './clingo/scripts/create_binary_mirror.sh'
           - './clingo/scripts/install_clingo.py'
-          - './clingo/scripts/copy_mirror_manylinux1.sh'
-          - './clingo/scripts/bootstrap_mirror_manylinux1.sh'
-          - './clingo/patches/spack_manylinux1.patch'
+          - './clingo/scripts/bootstrap_clingo_manylinux1.sh'
+          - './spack/patches/spack_rhel5.patch'
           manylinux2014:
-          - './Dockerfile.manylinux2014'
-          - './create_binary_mirror.sh'
+          - './clingo/Dockerfile.manylinux2014'
+          - './clingo/scripts/create_binary_mirror.sh'
+          - './clingo/scripts/install_clingo.py'
+          - './clingo/scripts/bootstrap_clingo_manylinux2014.sh'
+          - './spack/patches/spack_buildx.patch'
           centos6:
           - './clingo/Dockerfile.centos6'
           - './clingo/patches/centos6/*'
@@ -147,7 +149,7 @@ jobs:
           git clone https://github.com/spack/spack.git spack-src
           . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
-          spack python install_clingo.py
+          spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
           spack buildcache create -d $PWD/binary-mirror -a -u -f clingo-bootstrap
       - uses: actions/upload-artifact@v2
@@ -187,7 +189,7 @@ jobs:
         # Build and push only if the Dockerfile changed
         if: ${{ needs.changes.outputs.manylinux2014 == 'true' }}
         with:
-          file: ./Dockerfile.manylinux2014
+          file: ./clingo/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le
           pull: ${{ github.event_name == 'pull_request' }}
           push: true
@@ -200,7 +202,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          . ./copy_mirror_arm_ppc.sh
+          . ./clingo/scripts/copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v2
         with:
           name: clingo_binary_mirror
@@ -267,7 +269,7 @@ jobs:
           name: clingo_binary_mirror
       - run: |
           pip install ruamel.yaml
-          python clingo_json.py
+          python clingo/scripts/clingo_json.py
       - uses: actions/upload-artifact@v2
         with:
           name: clingo_manifest
