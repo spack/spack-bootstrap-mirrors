@@ -104,10 +104,10 @@ for spec_yaml in spec_yaml_files:
     current_hash = binary_data['clingo']['hash']
     mirror_entry = {
         "spec": SPEC_INFO[(current_os, current_target)]['spec'],
-        "hash": current_hash,
         "python": python_spec,
-        "sha256": shas[current_hash],
-        "compiler": compiler_entry(compiler_name, compiler_version, current_os, current_target) 
+        "binaries": [
+            ('clingo-bootstrap', current_hash, shas[current_hash])
+        ],
     }
     mirror_info.append(mirror_entry)
 

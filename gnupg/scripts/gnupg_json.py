@@ -125,7 +125,6 @@ for spec_yaml in spec_yaml_files:
     mirror_entry = {
         "spec": SPEC_INFO[(current_os, current_target)]['spec'],
         "binaries": binaries,
-        "compiler": compiler_entry(compiler_name, compiler_version, current_os, current_target) 
     }
     mirror_info.append(mirror_entry)
 
