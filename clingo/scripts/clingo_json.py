@@ -4,7 +4,7 @@ import glob
 import hashlib
 import os.path
 
-import ruamel.yaml
+import json
 
 # Each entry in clingo.json has the following keys:
 #
@@ -20,7 +20,7 @@ SPEC_INFO = {
     ('rhel5', 'x86_64'): {
         'spec': 'clingo-bootstrap%gcc platform=linux target=x86_64',
     },
-    ('centos6', 'x86_64'): {
+    ('centos7', 'x86_64'): {
         'spec': 'clingo-bootstrap%gcc platform=linux target=x86_64',
     },
     ('centos7', 'aarch64'): {
@@ -29,7 +29,7 @@ SPEC_INFO = {
     ('centos7', 'ppc64le'): {
         'spec': 'clingo-bootstrap%gcc platform=linux target=ppc64le',
     },
-    ('catalina', 'x86_64'): {
+    ('bigsur', 'x86_64'): {
         'spec': 'clingo-bootstrap%apple-clang platform=darwin target=x86_64',        
     }
 }
@@ -62,28 +62,30 @@ def tarball_hash(path):
 shaglob_expr = './build_cache/**/*.spack'
 tarballs = glob.glob(shaglob_expr, recursive=True)
 shas = {tarball_hash(tarball): sha256(tarball) for tarball in tarballs}
-print(shas)
 
-glob_expr = './build_cache/*.yaml'
+glob_expr = './build_cache/*.json'
 spec_yaml_files = glob.glob(glob_expr)
 
-yaml = ruamel.yaml.YAML()
 mirror_info = []
 for spec_yaml in spec_yaml_files:
-    # Get the raw data from spec.yaml
+    # Get the raw data from spec.json
     with open(spec_yaml) as f:
-        spec_yaml_data = yaml.load(f)['spec']
-    
+        spec_yaml_data = json.load(f)['spec']['nodes']
+
     # Cycle through the specs in raw data. We are only interested 
     # in clingo bootstrap
     binary_data = {}
     for entry in spec_yaml_data:
-        clingo_data = entry.get('clingo-bootstrap')
-        if clingo_data:
+        current_spec = entry['name']
+        if current_spec not in ('clingo-bootstrap', 'python'):
+            continue
+
+        if current_spec == 'clingo-bootstrap':
+            clingo_data = entry
             binary_data['clingo'] = clingo_data
 
-        python_data = entry.get('python')
-        if python_data:
+        elif current_spec == 'python':
+            python_data = entry
             binary_data['python'] = python_data
         
     assert 'clingo' in binary_data, 'entry "clingo" is required'

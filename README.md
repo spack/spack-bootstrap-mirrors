@@ -28,7 +28,7 @@ For completeness we report a summary of Spack requirements below:
 
 Name | Supported Versions | System Requirement | Requirement Reason
 --- | -------------------|---------------------|--------------------
-Python | 2.6,2.7,3.5-3.9 | Yes | Interpreter for Spack
+Python | 2.7,3.5-3.10 | Yes | Interpreter for Spack
 C/C++ compilers | - | Yes | Building software
 GNU make | - | Yes | Building software
 patch | - | Yes | Building software
@@ -40,7 +40,7 @@ bzip2 | - | Yes | Archive compression
 xz   | - | Yes | Archive compression
 zstd  | - | Yes | Archive compression
 file  | - |  Yes | Binary packages
-patchelf  | 0.9 or later |  No | Binary packages
+patchelf  | 0.13 or later |  No | Binary packages
 GnuPG  | 2.1 or later | No | Binary packages
 clingo | 5.5 | No | Concretization
 git | - | Yes | Software repositories
@@ -55,20 +55,21 @@ by compatibility with the [manylinux](https://github.com/pypa/manylinux) project
 
 Platform | OS | Compiler Toolchain | Architecture | Python
 ---------|----|--------------------|--------------|-------
-`linux` | `rhel5` | `GCC 9.3.0`| `x86_64` | 2.7,3.5-3.9
-`linux` | `centos6` | `GCC 9.3.0`| `x86_64` | 2.6
-`linux` | `centos7` | `GCC 9.3.1`| `aarch64` | 3.5-3.9
-`linux` | `centos7` | `GCC 9.3.1`| `ppc64le` | 3.5-3.9
-`darwin`| `MacOS 10.13` or later | `Apple Clang 12.0.0` | `x86_64` | 3.5-3.9
+`linux` | `rhel5` | `GCC 9.3.0`| `x86_64` | 2.7,3.5
+`linux` | `centos7` | `GCC 10.2.1`| `x86_64` | 3.6-3.10
+`linux` | `centos7` | `GCC 10.2.1`| `aarch64` | 3.6-3.10
+`linux` | `centos7` | `GCC 10.2.1`| `ppc64le` | 3.6-3.10
+`darwin`| `MacOS 10.13` or later | `Apple Clang 12.0.0` | `x86_64` | 3.5-3.10
 
-The `rhel5` choice corresponds to `manylinux1` and is used on
-`x86_64` architectures, `centos7` is instead due to `manylinux2014`
-and used on `aarch64` and `ppc64le`.
+The `rhel5` choice corresponds to `manylinux1` and is used to generate binaries to
+bootstrap unmaintained Python versions (i.e. 2.7 and 3.5) on `x86_64` architectures, 
+`centos7` is instead due to `manylinux2014`
+and used on `x86_64`, `aarch64` and `ppc64le` to bootstrap Python versions in the 3.6-3.10 range
 The choice of the compiler toolchain is determined
 by the necessity to support `C++14` for `clingo`. `GCC 9.3.0` has
 been built with Spack on top of the system compiler present on
-`rhel5` (`GCC 4.8.2`). `centos6` is used only to support `Python 2.6`
-build of `clingo`.
+`rhel5` (`GCC 4.8.2`). All the dependencies that are not a Python extensions are
+bootstrapped on `centos7` using `gcc@10.2.1` when the platform is `linux`.
 
 ## Github Actions Workflows
 
@@ -76,7 +77,7 @@ All the `linux` workflows make use, as a starting point, of a
 slightly customized version of either the
 [manylinux1](https://github.com/alalazo/manylinux/tree/manylinux1)
 image or of the
-[manylinux2014](https://github.com/alalazo/manylinux/tree/master) image, depending on the target architecture. The customization is minimal
+[manylinux2014](https://github.com/alalazo/manylinux/tree/master) image. The customization is minimal
 and amounts to avoid removing `libpython.a` in the final image, since
 this library is needed by `CMake` to build `clingo`. For a thorough
 explanation on why this library is missing upstream in the `manylinux`
@@ -95,13 +96,9 @@ machine and pushed to ghcr.io**.
 ### `clingo` specific caveats
 
 To avoid having runtime dependencies on `libstdc++.so`, `clingo` is
-linked against a static version of the runtime library. To add support
-for the `Python 2.6` interpreter coming with `centos6` `clingo` had to be patched so that the `PyCapsuleAPI` is provided in terms of
-`PYCObject`. Details for this operation are documented [here](https://py3c.readthedocs.io/en/latest/capsulethunk.html)
+linked against a static version of the runtime library.
 
 ### `GnuPG` specific caveats
 
-It is necessary to give the `ac_cv_func_inotify_init=no` option to
-build `GnuPG` on `rhel5` due to the old version of `glibc` on that OS.
 On `darwin` `GnuPG` had to be built with `--disable-nls --without-libintl-prefix` to avoid having binary requirements on 
 the system `libintl` installed in the CI environment.

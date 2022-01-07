@@ -1,4 +1,4 @@
-FROM ghcr.io/alalazo/manylinux2014:latest
+FROM ghcr.io/alalazo/manylinux2014:main
 
 RUN adduser -m spack
 
@@ -14,12 +14,17 @@ RUN git clone https://www.github.com/spack/spack.git
 COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux2014.sh /home/spack/bootstrap_clingo2014.sh
 COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
 COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
-COPY --chown=spack:spack spack/patches/spack_buildx.patch /home/spack/spack/spack.patch
-
-RUN cd spack && git apply spack.patch
 
 # Set externals, locate compilers
-RUN ${SPACK_CMD} external find --not-buildable cmake bison 
+RUN ${SPACK_CMD} external find --not-buildable bison 
 RUN ${SPACK_CMD} compiler find
+RUN ${SPACK_CMD} config add "config:concretizer:original"
+RUN ${SPACK_CMD} config add "config:install_tree:padded_length:128"
 
-RUN ${HOME}/bootstrap_clingo2014.sh
+RUN ${HOME}/bootstrap_clingo2014.sh 36
+RUN ${HOME}/bootstrap_clingo2014.sh 37
+RUN ${HOME}/bootstrap_clingo2014.sh 38
+RUN ${HOME}/bootstrap_clingo2014.sh 39
+RUN ${HOME}/bootstrap_clingo2014.sh 310
+
+RUN ${HOME}/create_binary_mirror.sh

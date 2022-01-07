@@ -2,9 +2,9 @@
 import json
 import glob
 import hashlib
+import json
 import os.path
 
-import ruamel.yaml
 
 # Each entry in gnupg.json has the following keys:
 #
@@ -16,7 +16,7 @@ import ruamel.yaml
 
 # Dictionary that maps (OS, TARGET) to info for the spec
 SPEC_INFO = {
-    ('rhel5', 'x86_64'): {
+    ('centos7', 'x86_64'): {
         'spec': 'gnupg@2.3: %gcc platform=linux target=x86_64',
     },
     ('centos7', 'aarch64'): {
@@ -25,7 +25,7 @@ SPEC_INFO = {
     ('centos7', 'ppc64le'): {
         'spec': 'gnupg@2.3: %gcc platform=linux target=ppc64le',
     },
-    ('catalina', 'x86_64'): {
+    ('bigsur', 'x86_64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=x86_64',        
     }
 }
@@ -58,51 +58,49 @@ def tarball_hash(path):
 shaglob_expr = './build_cache/**/*.spack'
 tarballs = glob.glob(shaglob_expr, recursive=True)
 shas = {tarball_hash(tarball): sha256(tarball) for tarball in tarballs}
-print(shas)
+#print(shas)
 
-glob_expr = './build_cache/*.yaml'
+glob_expr = './build_cache/*.json'
 spec_yaml_files = glob.glob(glob_expr)
 
-yaml = ruamel.yaml.YAML()
 mirror_info = []
 spec_yaml_dict = {}
 for spec_yaml in spec_yaml_files:
     if 'gnupg' not in spec_yaml:
         continue
-    
+    print(spec_yaml)
     # Get the raw data from spec.yaml
     with open(spec_yaml) as f:
-        spec_yaml_data = yaml.load(f)['spec']
-        
+        spec_yaml_data = json.load(f)['spec']['nodes']
+    
     # Find the GnuPG entry and store it somewhere
     binary_data = {}
     for entry in spec_yaml_data:
-        if 'gnupg' in entry:
-            binary_data['gnupg'] = entry['gnupg']
+        if 'gnupg' == entry['name']:
+            binary_data['gnupg'] = entry
+    assert 'gnupg' in binary_data
 
     # Cycle again through the specs and determine the order
     # of installation of dependencies        
     sorted_entries = []
     for entry in spec_yaml_data:
-        spec_yaml_dict.update(entry)
-        for key, item in entry.items():
-            dependencies = item.get('dependencies', {})
-            build_only = []
-            for name, dep_info in dependencies.items():                
-                if len(dep_info['type']) == 1 and 'build' in dep_info['type']:
-                    build_only.append(name)
+        spec_yaml_dict[entry['name']] = entry
+        
+        dependencies = entry.get('dependencies', [])
+        build_only = []
+        for dep_info in dependencies:                
+            name = dep_info['name']
+            if len(dep_info['type']) == 1 and 'build' in dep_info['type']:
+                build_only.append(name)
 
-            for name in build_only:
-                dependencies.pop(name)
-            dep_tuple = len(dependencies), key
-            print(dep_tuple)
-            sorted_entries.append(dep_tuple)
-            
+        entry['dependencies'] = [x for x in dependencies if x['name'] not in build_only]
+        dep_tuple = len(dependencies), entry['name']
+        sorted_entries.append(dep_tuple)
 
     # Sort the entries by number of dependencies
-    sorted_entries = [x for x in sorted_entries if x[1] in binary_data['gnupg']['dependencies']]
+    dependency_names = [x['name'] for x in binary_data['gnupg']['dependencies']]
+    sorted_entries = [x for x in sorted_entries if x[1] in dependency_names]
     sorted_entries.sort()
-
     binaries = []
     for ndeps, name in sorted_entries:
         current_hash = spec_yaml_dict[name]['hash']

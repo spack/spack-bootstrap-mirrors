@@ -2,7 +2,7 @@
 
 # Cycle over all the Python interpreters in manylinux1
 # and install the corresponding clingo-bootstrap binary
-for PYTHON in /opt/python/*/bin/python; do
+for PYTHON in /opt/python/cp${1}*/bin/python; do
   # Force reinstall a cmake for this Python interpreter
   ${PYTHON} -m pip -qq install --force-reinstall cmake
 
@@ -16,7 +16,3 @@ done
 
 # Clean pip cache
 /opt/python/cp39-cp39/bin/python -m pip cache purge
-
-# Create a binary mirror
-/bin/bash create_binary_mirror.sh
-

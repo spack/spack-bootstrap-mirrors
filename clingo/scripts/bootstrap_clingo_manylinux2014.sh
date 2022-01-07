@@ -2,7 +2,7 @@
 
 # Cycle over all the Python interpreters in manylinux2014
 # and install the corresponding clingo-bootstrap binary
-for PYTHON in /opt/python/*/bin/python; do
+for PYTHON in /opt/python/cp${1}*/bin/python; do
 
   # Install clingo using the current Python as an external
   # The Python version will be output to stdout
@@ -11,4 +11,4 @@ for PYTHON in /opt/python/*/bin/python; do
 done
 
 # Create a binary mirror
-/bin/bash create_binary_mirror.sh
+#/bin/bash create_binary_mirror.sh

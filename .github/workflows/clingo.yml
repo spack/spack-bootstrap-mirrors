@@ -7,16 +7,19 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+
+concurrency:
+  group: clingo-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   changes:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
-      manylinux1_gcc: ${{ steps.filter.outputs.manylinux1_gcc }}
-      manylinux1_mirrors: ${{ steps.filter.outputs.manylinux1_mirrors }}
+      manylinux1: ${{ steps.filter.outputs.manylinux1 }}
       manylinux2014: ${{ steps.filter.outputs.manylinux2014 }}
-      centos6: ${{ steps.filter.outputs.centos6 }}
     steps:
     - uses: actions/checkout@v2
       if: ${{ github.event_name == 'push' }}
@@ -28,66 +31,21 @@ jobs:
       with:
         # See https://github.com/dorny/paths-filter/issues/56 for the syntax used below
         filters: |
-          manylinux1_gcc:
-          - './clingo/Dockerfile.manylinux1_gcc9'
+          manylinux1:
+          - './clingo/Dockerfile.manylinux1'
           - './clingo/packages.yaml'
-          manylinux1_mirrors:
-          - './clingo/Dockerfile.manylinux1_mirrors'
           - './clingo/scripts/create_binary_mirror.sh'
           - './clingo/scripts/install_clingo.py'
           - './clingo/scripts/bootstrap_clingo_manylinux1.sh'
-          - './spack/patches/spack_rhel5.patch'
           manylinux2014:
           - './clingo/Dockerfile.manylinux2014'
           - './clingo/scripts/create_binary_mirror.sh'
           - './clingo/scripts/install_clingo.py'
           - './clingo/scripts/bootstrap_clingo_manylinux2014.sh'
-          - './spack/patches/spack_buildx.patch'
-          centos6:
-          - './clingo/Dockerfile.centos6'
-          - './clingo/patches/centos6/*'
-          - './clingo/scripts/centos6/*'
 
-  manylinux_gcc:
+  manylinux1:
     runs-on: ubuntu-latest
     needs: [ changes ]
-    env:
-      PLATFORM: x86_64
-      COMMIT_SHA: ${{ github.sha }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      # Setup tags to be used for docker images
-      - uses: crazy-max/ghaction-docker-meta@v1
-        id: docker_meta
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/manylinux1_gcc9_x86_64
-
-      # Login to Github Packages
-      - uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - uses: docker/setup-buildx-action@v1
-
-      # Build and eventually push to registry
-      - uses: docker/build-push-action@v2
-        # Build and push only if the Dockerfile changed
-        if: ${{ needs.changes.outputs.manylinux1_gcc == 'true' }}
-        with:
-          file: ./clingo/Dockerfile.manylinux1_gcc9
-          platforms: linux/amd64
-          pull: ${{ github.event_name == 'pull_request' }}
-          push: true
-          tags: ghcr.io/alalazo/manylinux1_gcc9_x86_64:latest
-          labels: ${{ steps.docker_meta.outputs.labels }}
-
-  manylinux1_mirrors:
-    runs-on: ubuntu-latest
-    needs: [ changes, manylinux_gcc ]
     env:
       PLATFORM: x86_64
       COMMIT_SHA: ${{ github.sha }}
@@ -105,25 +63,28 @@ jobs:
       - uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/setup-buildx-action@v1
 
       # Build and eventually push to registry
       - uses: docker/build-push-action@v2
-        if: ${{ needs.changes.outputs.manylinux1_mirrors == 'true' }}
+        # Build and push only if the Dockerfile changed
+        if: ${{ needs.changes.outputs.manylinux1 == 'true' }}
         with:
-          file: ./clingo/Dockerfile.manylinux1_mirrors
+          file: ./clingo/Dockerfile.manylinux1
           platforms: linux/amd64
           pull: ${{ github.event_name == 'pull_request' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: true
-          tags: ghcr.io/alalazo/manylinux1_mirrors_x86_64:latest
+          tags: ghcr.io/alalazo/manylinux1_mirrors:latest
           labels: ${{ steps.docker_meta.outputs.labels }}
 
-  upload-x86-64:
+  upload-manylinux1:
     runs-on: ubuntu-latest
-    needs: [ manylinux1_mirrors ]
+    needs: [ manylinux1 ]
     steps:
       - uses: actions/checkout@v2
       - run: |
@@ -137,18 +98,22 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+        python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - run: |
+      - name: Prepare Spack
+        run: |
           brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
           git clone https://github.com/spack/spack.git spack-src
           . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
+      - name: Install clingo
+        run: |
+          . spack-src/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
           spack buildcache create -d $PWD/binary-mirror -a -u -f clingo-bootstrap
@@ -174,8 +139,8 @@ jobs:
       - uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/setup-qemu-action@v1
         id: qemu
@@ -187,16 +152,18 @@ jobs:
       # Build and eventually push to registry
       - uses: docker/build-push-action@v2
         # Build and push only if the Dockerfile changed
-        if: ${{ needs.changes.outputs.manylinux2014 == 'true' }}
+        if: ${{ needs.changes.outputs.manylinux2014 == 'false' }}
         with:
           file: ./clingo/Dockerfile.manylinux2014
-          platforms: linux/arm64,linux/ppc64le
+          platforms: linux/arm64,linux/ppc64le,linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           pull: ${{ github.event_name == 'pull_request' }}
           push: true
           tags: ghcr.io/alalazo/manylinux2014_mirrors:latest
           labels: ${{ steps.docker_meta.outputs.labels }}
 
-  upload-arm64-ppc64le:
+  upload-manylinux2014:
     runs-on: ubuntu-latest
     needs: [ manylinux2014 ]
     steps:
@@ -209,56 +176,9 @@ jobs:
           path: |
             binary-mirror
 
-  centos6:
-    runs-on: ubuntu-latest
-    needs: [ changes ]
-    env:
-      COMMIT_SHA: ${{ github.sha }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      # Setup tags to be used for docker images
-      - uses: crazy-max/ghaction-docker-meta@v1
-        id: docker_meta
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/centos6_x86_64
-
-      # Login to Github Packages
-      - uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - uses: docker/setup-buildx-action@v1
-
-      # Build and eventually push to registry
-      - uses: docker/build-push-action@v2
-        if: ${{ needs.changes.outputs.centos6 == 'true' }}
-        with:
-          file: ./clingo/Dockerfile.centos6
-          platforms: linux/amd64
-          pull: ${{ github.event_name == 'pull_request' }}
-          push: true
-          tags: ghcr.io/alalazo/centos6_x86_64:latest
-          labels: ${{ steps.docker_meta.outputs.labels }}
-
-  upload-centos6:
-    runs-on: ubuntu-latest
-    needs: [ centos6 ]
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          . ./clingo/scripts/centos6/copy_mirror.sh
-      - uses: actions/upload-artifact@v2
-        with:
-          name: clingo_binary_mirror
-          path: binary-mirror
-
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ upload-arm64-ppc64le, upload-x86-64, macos_clingo, upload-centos6 ]
+    needs: [ upload-manylinux2014, upload-manylinux1, macos_clingo ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2

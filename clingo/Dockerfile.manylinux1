@@ -1,0 +1,61 @@
+FROM ghcr.io/alalazo/manylinux1-static-libs:latest
+
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV PATH /opt/rh/devtoolset-2/root/usr/bin:$PATH
+ENV LD_LIBRARY_PATH /opt/rh/devtoolset-2/root/usr/lib64:/opt/rh/devtoolset-2/root/usr/lib:/usr/local/lib64:/usr/local/lib
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
+RUN yum update  -y && \
+    yum install -y unzip make patch gnupg2 git xz tar perl-devel gettext-devel && \
+    rm -rf /var/cache/yum && \
+    yum clean all
+
+# Update ld.so.conf and ld.so.cache to find stuff in /usr/local/lib
+RUN echo /usr/local/lib > /etc/ld.so.conf.d/libcrypt.conf && ldconfig
+
+RUN adduser -m spack
+
+# Switch to a non-root user
+USER spack
+ENV SPACK_CMD="/opt/python/cp39-cp39/bin/python /home/spack/spack/bin/spack"
+WORKDIR /home/spack
+
+# Use gettext as external
+COPY --chown=spack:spack clingo/packages.yaml /home/spack/.spack/packages.yaml
+
+# Clone the repo and install Spack
+RUN git clone https://www.github.com/spack/spack.git
+
+# Install tar since the one that ships with CentOS 5 can't handle .xz archives
+RUN ${SPACK_CMD} config add config:concretizer:original
+RUN ${SPACK_CMD} install tar target=x86_64 
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install gmake target=x86_64 
+
+RUN mkdir /home/spack/mirror
+
+RUN ${SPACK_CMD} mirror create -d /home/spack/mirror -D gcc@9.3.0 target=x86_64 && \
+    ${SPACK_CMD} mirror add mirror file:///home/spack/mirror
+
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install --only=dependencies gcc@9.3.0 target=x86_64 && \
+    ${SPACK_CMD} clean -a
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install -v gcc@9.3.0 target=x86_64 && ${SPACK_CMD} clean -a
+
+# Register the compiler and move it out of the platform scope
+RUN ${SPACK_CMD} compiler add $(${SPACK_CMD} location -i gcc) && \
+    cp /home/spack/.spack/linux/compilers.yaml /home/spack/.spack/compilers.yaml
+
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install -v bison@3: target=x86_64 && ${SPACK_CMD} clean -a
+
+# Run a script to build all the versions of clingo we could
+COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux1.sh /home/spack/bootstrap_clingo.sh
+COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
+COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
+COPY --chown=spack:spack spack/patches/spack_rhel5.patch /home/spack/spack/spack.patch
+
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${HOME}/bootstrap_clingo.sh 27
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${HOME}/bootstrap_clingo.sh 35
+
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install -v file target=x86_64 && ${SPACK_CMD} clean -a
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i file)/bin:$PATH ${HOME}/create_binary_mirror.sh
