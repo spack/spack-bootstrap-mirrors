@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # Setup tags to be used for docker images
-      - uses: crazy-max/ghaction-docker-meta@v1
+      - uses: docker/metadata-action@v3
         id: docker_meta
         with:
           images: ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014
