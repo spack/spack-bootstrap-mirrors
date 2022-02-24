@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:        
+      - v0.**
   pull_request:
     branches:
       - master
@@ -14,25 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    # Set job outputs to values from filter step
-    outputs:
-      manylinux2014: ${{ steps.filter.outputs.manylinux2014 }}
-    steps:
-    - uses: actions/checkout@v2
-      if: ${{ github.event_name == 'push' }}
-      with:
-        fetch-depth: 0
-    # For pull requests it's not necessary to checkout the code
-    - uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        # See https://github.com/dorny/paths-filter/issues/56 for the syntax used below
-        filters: |
-          manylinux2014:
-          - './gnupg/Dockerfile.manylinux2014'
-
   darwin:
     runs-on: macos-latest
     steps:
@@ -61,8 +44,7 @@ jobs:
           path: binary-mirror
 
   manylinux2014:
-    runs-on: ubuntu-latest
-    needs: [ changes ]
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v2
@@ -77,8 +59,8 @@ jobs:
       - uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - uses: docker/setup-qemu-action@v1
         id: qemu
@@ -89,16 +71,17 @@ jobs:
 
       # Build and eventually push to registry
       - uses: docker/build-push-action@v2
-        # Build and push only if the Dockerfile changed
-        if: ${{ needs.changes.outputs.manylinux2014 == 'true' }}
         with:
           file: ./gnupg/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le,linux/amd64
           pull: ${{ github.event_name == 'pull_request' }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014:latest
+          # Self-hosted runners use the local cache
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache-gnupg-manylinux2014
+          cache-to: type=local,dest=/tmp/.buildx-cache-gnupg-manylinux2014,mode=max
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
 
   upload-manylinux2014:

@@ -35,12 +35,12 @@ RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install gmake ta
 
 RUN mkdir /home/spack/mirror
 
-RUN ${SPACK_CMD} mirror create -d /home/spack/mirror -D gcc@9.3.0 target=x86_64 && \
+RUN ${SPACK_CMD} mirror create -d /home/spack/mirror -D gcc@9.3.0  ^mpc@1.1.0 target=x86_64 && \
     ${SPACK_CMD} mirror add mirror file:///home/spack/mirror
 
-RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install --only=dependencies gcc@9.3.0 target=x86_64 && \
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install --only=dependencies gcc@9.3.0 ^mpc@1.1.0 target=x86_64 && \
     ${SPACK_CMD} clean -a
-RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install -v gcc@9.3.0 target=x86_64 && ${SPACK_CMD} clean -a
+RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/bin:$PATH ${SPACK_CMD} install -v gcc@9.3.0 ^mpc@1.1.0 target=x86_64 && ${SPACK_CMD} clean -a
 
 # Register the compiler and move it out of the platform scope
 RUN ${SPACK_CMD} compiler add $(${SPACK_CMD} location -i gcc) && \
@@ -52,7 +52,6 @@ RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$(${SPACK_CMD} location -i gmake)/b
 COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux1.sh /home/spack/bootstrap_clingo.sh
 COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
 COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
-COPY --chown=spack:spack spack/patches/spack_rhel5.patch /home/spack/spack/spack.patch
 
 RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${HOME}/bootstrap_clingo.sh 27
 RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${HOME}/bootstrap_clingo.sh 35
