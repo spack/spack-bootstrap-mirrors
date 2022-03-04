@@ -23,7 +23,7 @@ jobs:
       COMMIT_SHA: ${{ github.sha }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Setup tags to be used for docker images
       - uses: docker/metadata-action@v3
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ manylinux1 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           . ./clingo/scripts/copy_mirror_manylinux1.sh
       - uses: actions/upload-artifact@v2
@@ -73,7 +73,7 @@ jobs:
       matrix:
         python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -101,7 +101,7 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Setup tags to be used for docker images
       - uses: docker/metadata-action@v3
@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ manylinux2014 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           . ./clingo/scripts/copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v2
@@ -155,7 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ upload-manylinux2014, upload-manylinux1, macos_clingo ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
