@@ -75,9 +75,9 @@ bootstrapped on `centos7` using `gcc@10.2.1` when the platform is `linux`.
 
 All the `linux` workflows make use, as a starting point, of a
 slightly customized version of either the
-[manylinux1](https://github.com/alalazo/manylinux/tree/manylinux1)
+[manylinux1](https://github.com/spack/manylinux1-static-libs)
 image or of the
-[manylinux2014](https://github.com/alalazo/manylinux/tree/master) image. The customization is minimal
+[manylinux2014](https://github.com/spack/manylinux) image. The customization is minimal
 and amounts to avoid removing `libpython.a` in the final image, since
 this library is needed by `CMake` to build `clingo`. For a thorough
 explanation on why this library is missing upstream in the `manylinux`

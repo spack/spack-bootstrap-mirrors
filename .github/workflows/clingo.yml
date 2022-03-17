@@ -18,6 +18,8 @@ concurrency:
 jobs:
   manylinux1:
     runs-on: self-hosted
+    outputs:
+      spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
     env:
       PLATFORM: x86_64
       COMMIT_SHA: ${{ github.sha }}
@@ -29,7 +31,7 @@ jobs:
       - uses: docker/metadata-action@v3
         id: docker_meta
         with:
-          images: ghcr.io/${{ github.repository_owner }}/manylinux1_mirrors
+          images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux1
 
       # Login to Github Packages
       - uses: docker/login-action@v1
@@ -51,13 +53,15 @@ jobs:
           # cache-to: type=gha,mode=max
           cache-from: type=local,src=/tmp/.buildx-cache-clingo-manylinux1
           cache-to: type=local,dest=/tmp/.buildx-cache-clingo-manylinux1,mode=max
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
 
   upload-manylinux1:
     runs-on: ubuntu-latest
     needs: [ manylinux1 ]
+    env:
+      SPACK_MANYLINUX1_TAG: ${{ needs.manylinux1.outputs.spack_manylinux_tag }}
     steps:
       - uses: actions/checkout@v3
       - run: |
@@ -79,6 +83,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Prepare Spack
         run: |
+          pip install --upgrade pip
           brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
           git clone https://github.com/spack/spack.git spack-src
@@ -97,6 +102,8 @@ jobs:
 
   manylinux2014:
     runs-on: self-hosted
+    outputs:
+      spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
     permissions:
       packages: write
 
@@ -107,7 +114,7 @@ jobs:
       - uses: docker/metadata-action@v3
         id: docker_meta
         with:
-          images: ghcr.io/${{ github.repository_owner }}/manylinux2014_mirrors
+          images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014
 
       # Login to Github Packages
       - uses: docker/login-action@v1
@@ -134,13 +141,15 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache-clingo-manylinux2014
           cache-to: type=local,dest=/tmp/.buildx-cache-clingo-manylinux2014,mode=max
           pull: ${{ github.event_name == 'pull_request' }}
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
 
   upload-manylinux2014:
     runs-on: ubuntu-latest
     needs: [ manylinux2014 ]
+    env:
+      SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
     steps:
       - uses: actions/checkout@v3
       - run: |

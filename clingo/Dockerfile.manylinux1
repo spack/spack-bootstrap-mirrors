@@ -1,4 +1,4 @@
-FROM ghcr.io/alalazo/manylinux1-static-libs:latest
+FROM ghcr.io/spack/manylinux1-static-libs:latest
 
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8

@@ -1,4 +1,4 @@
-FROM ghcr.io/alalazo/manylinux2014:main
+FROM ghcr.io/spack/manylinux2014:latest
 
 RUN adduser -m spack
 

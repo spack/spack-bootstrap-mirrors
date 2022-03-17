@@ -1,4 +1,6 @@
-FROM ghcr.io/alalazo/manylinux2014:main
+FROM ghcr.io/spack/manylinux2014:latest
+
+RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
 
 RUN adduser -m spack
 
