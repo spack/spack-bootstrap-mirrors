@@ -38,7 +38,7 @@ jobs:
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
           spack install gnupg cflags="-mmacosx-version-min=10.13" target=x86_64
           spack buildcache create -d $PWD/binary-mirror -a -u -f gnupg
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
           path: binary-mirror
@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: |
           . ./gnupg/scripts/copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
           path: |
@@ -116,7 +116,7 @@ jobs:
       - run: |
           pip install ruamel.yaml
           python gnupg/scripts/gnupg_json.py
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: gnupg_manifest
           path: |
