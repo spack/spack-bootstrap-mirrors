@@ -123,7 +123,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-qemu-action@v2
         id: qemu
         with:
           platforms: linux/ppc64le,linux/arm64
