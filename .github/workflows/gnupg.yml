@@ -20,7 +20,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
       - run: |
           brew install gawk perl
           git clone https://github.com/spack/spack.git spack-src
@@ -107,7 +107,7 @@ jobs:
     needs: [ upload-manylinux2014, darwin ]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - uses: actions/download-artifact@v3
