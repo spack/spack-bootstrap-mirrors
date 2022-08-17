@@ -3,12 +3,12 @@ name: "Patchelf"
 on:
   push:
     branches:
-      - master
+      - main
     tags:        
       - v0.**
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -38,7 +38,7 @@ jobs:
           path: binary-mirror
 
   manylinux2014:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     outputs:
       spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
 
