@@ -24,9 +24,6 @@ SPEC_INFO = {
     },
     ('centos7', 'ppc64le'): {
         'spec': 'patchelf@0.13: %gcc platform=linux target=ppc64le',
-    },
-    ('bigsur', 'x86_64'): {
-        'spec': 'patchelf@0.13: %apple-clang platform=darwin target=x86_64',        
     }
 }
 

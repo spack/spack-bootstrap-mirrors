@@ -16,26 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  darwin:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      - run: |
-          brew install cmake
-          git clone https://github.com/spack/spack.git spack-src
-
-          . spack-src/share/spack/setup-env.sh
-          spack external find --not-buildable cmake
-          mkdir -p binary-mirror
-
-          # Inject flags to have compatibility with MacOSX version 10.13 or higher
-          spack install patchelf cflags="-mmacosx-version-min=10.13" target=x86_64
-          spack buildcache create -d $PWD/binary-mirror -a -u -f patchelf
-      - uses: actions/upload-artifact@v3
-        with:
-          name: patchelf_binary_mirror
-          path: binary-mirror
 
   manylinux2014:
     runs-on: ubuntu-20.04
@@ -98,7 +78,7 @@ jobs:
 
   patchelf_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, darwin ]
+    needs: [ upload-manylinux2014 ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
