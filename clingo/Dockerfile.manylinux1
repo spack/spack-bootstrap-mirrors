@@ -30,7 +30,8 @@ RUN git clone https://www.github.com/spack/spack.git
 
 # Install tar since the one that ships with CentOS 5 can't handle .xz archives
 RUN ${SPACK_CMD} config add config:concretizer:original
-RUN ${SPACK_CMD} install tar target=x86_64 
+RUN ${SPACK_CMD} external find diffutils
+RUN SED_ERE_OPT= ${SPACK_CMD} install --fail-fast tar target=x86_64
 RUN PATH=$(${SPACK_CMD} location -i tar)/bin:$PATH ${SPACK_CMD} install gmake target=x86_64 
 
 RUN mkdir /home/spack/mirror
