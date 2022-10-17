@@ -1,25 +1,25 @@
 diff --git a/var/spack/repos/builtin/packages/gnupg/package.py b/var/spack/repos/builtin/packages/gnupg/package.py
-index dd06b564ca..9d44291efe 100644
+index 6d9b89b72a..d80d042c88 100644
 --- a/var/spack/repos/builtin/packages/gnupg/package.py
 +++ b/var/spack/repos/builtin/packages/gnupg/package.py
-@@ -69,6 +69,7 @@ def configure_args(self):
-             '--with-zlib='                + self.spec['zlib'].prefix,
-             '--without-tar',
-             '--without-libiconv-prefix',
-+            '--without-libintl-prefix',
-             '--without-readline',
+@@ -142,6 +142,7 @@ def configure_args(self):
+             "--with-zlib=" + self.spec["zlib"].prefix,
+             "--without-tar",
+             "--without-libiconv-prefix",
++            "--without-libintl-prefix",
+             "--without-readline",
          ]
  
 diff --git a/var/spack/repos/builtin/packages/libgpg-error/package.py b/var/spack/repos/builtin/packages/libgpg-error/package.py
-index 3a91cfd824..65a9ce74cd 100644
+index 8b6924492f..42c9276516 100644
 --- a/var/spack/repos/builtin/packages/libgpg-error/package.py
 +++ b/var/spack/repos/builtin/packages/libgpg-error/package.py
-@@ -32,5 +32,7 @@ def configure_args(self):
-         return [
-             '--enable-static',
-             '--enable-shared',
--            '--enable-tests' if self.run_tests else '--disable-tests'
-+            '--enable-tests' if self.run_tests else '--disable-tests',
-+            '--without-libintl-prefix',
-+            '--disable-nls'
+@@ -35,6 +35,8 @@ def configure_args(self):
+         args = [
+             "--enable-static",
+             "--enable-shared",
++            "--without-libintl-prefix",
++            "--disable-nls",
+             "--enable-tests" if self.run_tests else "--disable-tests",
          ]
+         if self.spec.satisfies("@1.46:"):
