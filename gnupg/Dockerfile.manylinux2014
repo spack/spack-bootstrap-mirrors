@@ -1,4 +1,4 @@
-FROM ghcr.io/spack/manylinux2014:latest
+FROM ghcr.io/spack/manylinux2014:develop
 
 RUN adduser -m spack
 
