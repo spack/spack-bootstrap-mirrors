@@ -46,7 +46,7 @@ jobs:
           path: binary-mirror
 
   manylinux2014:
-    runs-on: self-hosted
+    runs-on: ["self-hosted", "Linux"]
     outputs:
       spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
     permissions:
