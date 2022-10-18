@@ -17,10 +17,16 @@ concurrency:
 
 jobs:
   macos_gnupg:
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner[0] }}
     strategy:
+      # List of:
+      # 1. Runners
+      # 2. Target architectures
       matrix:
-        runner: ["macos-latest", ["self-hosted", "macOS", "ARM64"]]
+        runner: [
+          ["macos-latest", "x86_64"], 
+          [["self-hosted", "macOS", "ARM64"], ["m1"]]
+        ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
@@ -39,7 +45,7 @@ jobs:
           mkdir -p binary-mirror
 
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
-          spack install gnupg cflags="-mmacosx-version-min=10.13" target=x86_64
+          spack install gnupg cflags="-mmacosx-version-min=10.13" target=${{ matrix.runner[1] }}
           spack buildcache create -d $PWD/binary-mirror -a -u -f gnupg
       - uses: actions/upload-artifact@v3
         with:
