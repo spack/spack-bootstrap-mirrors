@@ -30,6 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
+          echo $PATH
           brew install gawk perl
           git clone https://github.com/spack/spack.git spack-src
 
