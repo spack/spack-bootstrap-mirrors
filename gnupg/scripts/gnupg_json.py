@@ -28,8 +28,8 @@ SPEC_INFO = {
     ('bigsur', 'x86_64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=x86_64',        
     },
-    ('monterey', 'm1'): {
-        'spec': 'gnupg@2.3: %apple-clang platform=darwin target=m1',        
+    ('monterey', 'aarch64'): {
+        'spec': 'gnupg@2.3: %apple-clang platform=darwin target=aarch64',        
     }
 }
 

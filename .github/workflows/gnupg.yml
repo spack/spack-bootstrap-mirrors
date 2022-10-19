@@ -25,12 +25,14 @@ jobs:
       matrix:
         runner: [
           ["macos-latest", "x86_64"], 
-          [["self-hosted", "macOS", "ARM64"], "m1"]
+          [["self-hosted", "macOS", "ARM64"], "aarch64"]
         ]
     steps:
       - uses: actions/checkout@v3
       - run: |
-          export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+          if [[ ${{ matrix.runner[1] == "aarch64" }} ]] ; then
+              export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+          fi
           brew install gawk perl
           git clone https://github.com/spack/spack.git spack-src
 
