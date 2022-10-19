@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          if [[ ${{ matrix.runner[1] == "aarch64" }} ]] ; then
+          if [[ ${{ matrix.runner[1] }} == "aarch64" ]] ; then
               export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
           fi
           brew install gawk perl
