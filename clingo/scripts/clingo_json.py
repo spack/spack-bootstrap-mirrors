@@ -31,6 +31,9 @@ SPEC_INFO = {
     },
     ('bigsur', 'x86_64'): {
         'spec': 'clingo-bootstrap%apple-clang platform=darwin target=x86_64',        
+    },
+    ('monterey', 'aarch64'): {
+        'spec': 'clingo-bootstrap%apple-clang platform=darwin target=aarch64',        
     }
 }
 

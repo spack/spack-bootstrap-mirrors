@@ -27,6 +27,9 @@ SPEC_INFO = {
     },
     ('bigsur', 'x86_64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=x86_64',        
+    },
+    ('monterey', 'aarch64'): {
+        'spec': 'gnupg@2.3: %apple-clang platform=darwin target=aarch64',        
     }
 }
 
@@ -112,6 +115,10 @@ for spec_yaml in spec_yaml_files:
     
     current_os = binary_data['gnupg']['arch']['platform_os']
     current_target = binary_data['gnupg']['arch']['target']
+
+    # If the target is not generic, like x86_64 etc. it's a fully fledged object
+    if not isinstance(current_target, str):
+        current_target = current_target["name"]
     
     compiler_name = binary_data['gnupg']['compiler']['name']
     compiler_version = str(binary_data['gnupg']['compiler']['version'])
