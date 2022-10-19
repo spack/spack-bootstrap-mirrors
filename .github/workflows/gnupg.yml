@@ -25,7 +25,7 @@ jobs:
       matrix:
         runner: [
           ["macos-latest", "x86_64"], 
-          [["self-hosted", "macOS", "ARM64"], ["m1"]]
+          [["self-hosted", "macOS", "ARM64"], "m1"]
         ]
     steps:
       - uses: actions/checkout@v3
