@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos_clingo:
+  macos_clingo_x86_64:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -44,6 +44,44 @@ jobs:
         with:
           name: clingo_binary_mirror
           path: binary-mirror
+
+  macos_clingo_aarch64:
+    runs-on: ["self-hosted", "macOS", "ARM64"]
+    strategy:
+      matrix:
+        python-version: ["3.10.7"] # ["3.6.15", "3.7.14", "3.8.14", "3.9.14", "3.10.7"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare Spack
+        env:
+          PYENV_VERSION: ${{ matrix.python-version }}
+        run: |
+          export PATH="$(pyenv prefix)/bin:$PATH"
+          python --version
+          
+          brew install cmake bison
+          export PATH="/Users/spack-bootstrap-runner/homebrew/opt/bison/bin:$PATH"
+          
+          pyenv exec pip install --upgrade pip
+          
+          git clone https://github.com/spack/spack.git spack-src
+          . spack-src/share/spack/setup-env.sh
+          spack external find --not-buildable cmake bison
+      - name: Install clingo
+        env:
+          PYENV_VERSION: ${{ matrix.python-version }}
+        run: |
+          export PATH="$(pyenv prefix)/bin:$PATH"
+          python --version
+          . spack-src/share/spack/setup-env.sh
+          spack python clingo/scripts/install_clingo.py
+          mkdir -p binary-mirror
+          spack buildcache create -d $PWD/binary-mirror -a -u -f clingo-bootstrap
+      - uses: actions/upload-artifact@v3
+        with:
+          name: clingo_binary_mirror
+          path: binary-mirror
+
 
   manylinux2014:
     runs-on: ["self-hosted", "Linux"]
@@ -107,7 +145,7 @@ jobs:
 
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_clingo ]
+    needs: [ upload-manylinux2014, macos_clingo_x86_64, macos_clingo_aarch64 ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
