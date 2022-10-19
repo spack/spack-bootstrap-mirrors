@@ -3,7 +3,7 @@ name: "GnuPG"
 on:
   push:
     branches:
-      - master
+      - main
     tags:        
       - v0.**
   pull_request:
