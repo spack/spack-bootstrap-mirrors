@@ -1,4 +1,4 @@
-FROM ghcr.io/spack/manylinux2014:latest
+FROM ghcr.io/spack/manylinux2014:v2022-10-25
 
 RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
 
@@ -28,5 +28,6 @@ RUN ${HOME}/bootstrap_clingo2014.sh 37
 RUN ${HOME}/bootstrap_clingo2014.sh 38
 RUN ${HOME}/bootstrap_clingo2014.sh 39
 RUN ${HOME}/bootstrap_clingo2014.sh 310
+RUN ${HOME}/bootstrap_clingo2014.sh 311
 
 RUN ${HOME}/create_binary_mirror.sh
