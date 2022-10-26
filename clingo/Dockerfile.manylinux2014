@@ -1,4 +1,4 @@
-FROM ghcr.io/spack/manylinux2014:develop
+FROM ghcr.io/spack/manylinux2014:v2022-10-25
 
 RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
 
