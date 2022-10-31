@@ -26,7 +26,7 @@ For completeness we report a summary of Spack requirements below:
 
 Name | Supported Versions | System Requirement | Requirement Reason
 --- | -------------------|---------------------|--------------------
-Python | 2.7,3.5-3.10 | Yes | Interpreter for Spack
+Python | 3.6-3.11 | Yes | Interpreter for Spack
 C/C++ compilers | - | Yes | Building software
 GNU make | - | Yes | Building software
 patch | - | Yes | Building software
