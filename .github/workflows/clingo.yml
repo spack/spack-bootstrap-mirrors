@@ -34,6 +34,7 @@ jobs:
           git clone https://github.com/spack/spack.git spack-src
           . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
+          spack config add "config:install_tree:padded_length:256"
       - name: Install clingo
         run: |
           . spack-src/share/spack/setup-env.sh
@@ -68,6 +69,7 @@ jobs:
           git clone https://github.com/spack/spack.git spack-src
           . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
+          spack config add "config:install_tree:padded_length:256"
       - name: Install clingo
         env:
           PYENV_VERSION: ${{ matrix.python-version }}

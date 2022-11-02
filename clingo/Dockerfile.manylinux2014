@@ -21,7 +21,7 @@ COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/crea
 RUN ${SPACK_CMD} external find --not-buildable bison 
 RUN ${SPACK_CMD} compiler find
 RUN ${SPACK_CMD} config add "config:concretizer:original"
-RUN ${SPACK_CMD} config add "config:install_tree:padded_length:128"
+RUN ${SPACK_CMD} config add "config:install_tree:padded_length:256"
 
 RUN ${HOME}/bootstrap_clingo2014.sh 36
 RUN ${HOME}/bootstrap_clingo2014.sh 37
