@@ -23,7 +23,7 @@ jobs:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Prepare Spack
@@ -152,7 +152,7 @@ jobs:
     needs: [ upload-manylinux2014, macos_clingo_x86_64, macos_clingo_aarch64 ]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - uses: actions/download-artifact@v3
