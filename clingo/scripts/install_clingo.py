@@ -1,11 +1,15 @@
+import sys
+
 import archspec.cpu
 
 import spack.bootstrap.config
 import spack.main
 
 
-CLINGO_BASE_SPEC = "clingo-bootstrap@spack +static_libstdcpp +optimized +ipo ~docs"
-
+if sys.platform == "linux":
+    CLINGO_BASE_SPEC = "clingo-bootstrap@spack +static_libstdcpp +optimized +ipo ~docs"
+else:
+    CLINGO_BASE_SPEC = "clingo-bootstrap@spack +optimized +ipo ~docs"
 
 install = spack.main.SpackCommand('install')
 
