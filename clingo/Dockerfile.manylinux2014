@@ -1,4 +1,4 @@
-FROM ghcr.io/spack/manylinux2014:v2022-10-25
+FROM ghcr.io/spack/manylinux2014:releases-v2023-09-15
 
 RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
 
@@ -6,22 +6,21 @@ RUN adduser -m spack
 
 # Switch to a non-root user
 USER spack
-ENV SPACK_CMD="/opt/python/cp39-cp39/bin/python /home/spack/spack/bin/spack"
+ENV SPACK_CMD="/opt/python/cp311-cp311/bin/python /home/spack/spack/bin/spack"
 WORKDIR /home/spack
 
 # Clone the repo and install Spack
 RUN git clone https://www.github.com/spack/spack.git
 
-# Run a script to build all the versions of clingo we could
-COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux2014.sh /home/spack/bootstrap_clingo2014.sh
-COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
-COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
-
 # Set externals, locate compilers
-RUN ${SPACK_CMD} external find --not-buildable bison 
+RUN ${SPACK_CMD} external find -j 1 --not-buildable bison cmake
 RUN ${SPACK_CMD} compiler find
 RUN ${SPACK_CMD} config add "config:concretizer:original"
 RUN ${SPACK_CMD} config add "config:install_tree:padded_length:256"
+
+# Run a script to build all the versions of clingo we could
+COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux2014.sh /home/spack/bootstrap_clingo2014.sh
+COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
 
 RUN ${HOME}/bootstrap_clingo2014.sh 36
 RUN ${HOME}/bootstrap_clingo2014.sh 37
@@ -29,5 +28,7 @@ RUN ${HOME}/bootstrap_clingo2014.sh 38
 RUN ${HOME}/bootstrap_clingo2014.sh 39
 RUN ${HOME}/bootstrap_clingo2014.sh 310
 RUN ${HOME}/bootstrap_clingo2014.sh 311
+RUN ${HOME}/bootstrap_clingo2014.sh 312
 
+COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
 RUN ${HOME}/create_binary_mirror.sh
