@@ -1,4 +1,4 @@
-"""Produce the clingo.json file associated with the mirror"""
+"""Produce the gnupg.json file associated with the mirror"""
 import json
 import glob
 import hashlib

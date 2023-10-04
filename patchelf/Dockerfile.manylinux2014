@@ -1,10 +1,10 @@
-FROM ghcr.io/spack/manylinux2014:v2022-10-25
+FROM ghcr.io/spack/manylinux2014:v2023-10-03
 
 RUN adduser -m spack
 
 # Switch to a non-root user
 USER spack
-ENV SPACK_CMD="/opt/python/cp39-cp39/bin/python /home/spack/spack/bin/spack"
+ENV SPACK_CMD="/opt/python/cp311-cp311/bin/python /home/spack/spack/bin/spack"
 WORKDIR /home/spack
 
 # Clone the repo and install Spack
