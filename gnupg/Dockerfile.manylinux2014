@@ -18,4 +18,4 @@ RUN ${SPACK_CMD} python -c "import archspec.cpu;print(archspec.cpu.host().family
 RUN ${SPACK_CMD} -c  "config:install_tree:padded_length:256" install gnupg target=$(cat target.txt)
 
 RUN mkdir -p /home/spack/binary-mirror && \
-    ${SPACK_CMD} -c  "config:install_tree:padded_length:256" buildcache create -d /home/spack/binary-mirror -a -u -f gnupg target=$(cat target.txt)
+    ${SPACK_CMD} -c  "config:install_tree:padded_length:256" buildcache push -a -u -f /home/spack/binary-mirror gnupg target=$(cat target.txt)
