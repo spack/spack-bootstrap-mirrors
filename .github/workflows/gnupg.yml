@@ -119,13 +119,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.11
       - uses: actions/download-artifact@v3
         with:
           name: gnupg_binary_mirror
       - run: |
-          pip install ruamel.yaml
-          python gnupg/scripts/gnupg_json.py
+          git clone https://github.com/spack/spack.git spack-src
+          . spack-src/share/spack/setup-env.sh
+          spack python gnupg/scripts/gnupg_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_manifest

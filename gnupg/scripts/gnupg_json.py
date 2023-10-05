@@ -5,6 +5,9 @@ import hashlib
 import json
 import os.path
 
+import spack.spec
+import spack.traverse
+
 
 # Each entry in gnupg.json has the following keys:
 #
@@ -25,10 +28,10 @@ SPEC_INFO = {
     ('centos7', 'ppc64le'): {
         'spec': 'gnupg@2.3: %gcc platform=linux target=ppc64le',
     },
-    ('bigsur', 'x86_64'): {
+    ('monterey', 'x86_64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=x86_64',        
     },
-    ('monterey', 'aarch64'): {
+    ('ventura', 'aarch64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=aarch64',        
     }
 }
@@ -61,56 +64,35 @@ def tarball_hash(path):
 shaglob_expr = './build_cache/**/*.spack'
 tarballs = glob.glob(shaglob_expr, recursive=True)
 shas = {tarball_hash(tarball): sha256(tarball) for tarball in tarballs}
-#print(shas)
 
 glob_expr = './build_cache/*.json'
-spec_yaml_files = glob.glob(glob_expr)
+spec_json_files = glob.glob(glob_expr)
 
 mirror_info = []
-spec_yaml_dict = {}
-for spec_yaml in spec_yaml_files:
-    if 'gnupg' not in spec_yaml:
+spec_json_dict = {}
+for spec_json in spec_json_files:
+    if 'gnupg' not in spec_json:
         continue
-    print(spec_yaml)
-    # Get the raw data from spec.yaml
-    with open(spec_yaml) as f:
-        spec_yaml_data = json.load(f)['spec']['nodes']
+    
+    s = spack.spec.Spec.from_specfile(spec_json)
+    binaries = []
+    for edge in reversed(spack.traverse.traverse_edges_topo([s], direction="children", deptype=("link", "run"))):
+        node = edge.spec        
+        binaries.append(
+            (node.name, node.dag_hash(), shas[node.dag_hash()])
+        )
+
+    # Get the raw data from spec.json
+    with open(spec_json) as f:
+       spec_json_data = json.load(f)['spec']['nodes']
     
     # Find the GnuPG entry and store it somewhere
     binary_data = {}
-    for entry in spec_yaml_data:
+    for entry in spec_json_data:
         if 'gnupg' == entry['name']:
             binary_data['gnupg'] = entry
     assert 'gnupg' in binary_data
 
-    # Cycle again through the specs and determine the order
-    # of installation of dependencies        
-    sorted_entries = []
-    for entry in spec_yaml_data:
-        spec_yaml_dict[entry['name']] = entry
-        
-        dependencies = entry.get('dependencies', [])
-        build_only = []
-        for dep_info in dependencies:                
-            name = dep_info['name']
-            if len(dep_info['type']) == 1 and 'build' in dep_info['type']:
-                build_only.append(name)
-
-        entry['dependencies'] = [x for x in dependencies if x['name'] not in build_only]
-        dep_tuple = len(dependencies), entry['name']
-        sorted_entries.append(dep_tuple)
-
-    # Sort the entries by number of dependencies
-    dependency_names = [x['name'] for x in binary_data['gnupg']['dependencies']]
-    sorted_entries = [x for x in sorted_entries if x[1] in dependency_names]
-    sorted_entries.sort()
-    binaries = []
-    for ndeps, name in sorted_entries:
-        current_hash = spec_yaml_dict[name]['hash']
-        binaries.append(
-            (name, current_hash, shas[current_hash])
-        )
-        
     assert 'gnupg' in binary_data, 'entry "gnupg" is required'
     
     current_os = binary_data['gnupg']['arch']['platform_os']
@@ -119,14 +101,8 @@ for spec_yaml in spec_yaml_files:
     # If the target is not generic, like x86_64 etc. it's a fully fledged object
     if not isinstance(current_target, str):
         current_target = current_target["name"]
-    
-    compiler_name = binary_data['gnupg']['compiler']['name']
-    compiler_version = str(binary_data['gnupg']['compiler']['version'])
-
+        
     current_hash = binary_data['gnupg']['hash']
-    binaries.append(
-        ('gnupg', current_hash, shas[current_hash])
-    )
     mirror_entry = {
         "spec": SPEC_INFO[(current_os, current_target)]['spec'],
         "binaries": binaries,
