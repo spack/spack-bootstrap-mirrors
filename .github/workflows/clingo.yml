@@ -122,11 +122,9 @@ jobs:
         with:
           file: ./clingo/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le,linux/amd64
-          # Self-hosted runners use the local cache
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
-          cache-from: type=local,src=/tmp/.buildx-cache-clingo-manylinux2014
-          cache-to: type=local,dest=/tmp/.buildx-cache-clingo-manylinux2014,mode=max
+          cache-from: |
+            ${{ steps.docker_meta.outputs.tags }}
+          cache-to: type=inline
           pull: ${{ github.event_name == 'pull_request' }}
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
