@@ -26,7 +26,7 @@ For completeness we report a summary of Spack requirements below:
 
 Name | Supported Versions | System Requirement | Requirement Reason
 --- | -------------------|---------------------|--------------------
-Python | 3.6-3.11 | Yes | Interpreter for Spack
+Python | 3.6-3.12 | Yes | Interpreter for Spack
 C/C++ compilers | - | Yes | Building software
 GNU make | - | Yes | Building software
 patch | - | Yes | Building software
@@ -39,7 +39,7 @@ xz   | - | Yes | Archive compression
 zstd  | - | Yes | Archive compression
 file  | - |  Yes | Binary packages
 patchelf  | 0.13 or later |  No | Binary packages
-GnuPG  | 2.1 or later | No | Binary packages
+GnuPG  | 2.3 or later | No | Binary packages
 clingo | 5.5 | No | Concretization
 git | - | Yes | Software repositories
 hg | - | Yes | Software repositories
@@ -53,11 +53,11 @@ by compatibility with the [manylinux](https://github.com/pypa/manylinux) project
 
 Platform | OS | Compiler Toolchain | Architecture | Python
 ---------|----|--------------------|--------------|-------
-`linux` | `centos7` | `GCC 10.2.1`| `x86_64` | 3.6-3.11
-`linux` | `centos7` | `GCC 10.2.1`| `aarch64` | 3.6-3.11
-`linux` | `centos7` | `GCC 10.2.1`| `ppc64le` | 3.6-3.11
-`darwin`| `MacOS 10.13` or later | `Apple Clang 13.0.0` | `x86_64` | 3.6-3.11
-`darwin`| `MacOS 10.13` or later | `Apple Clang 13.1.6` | `aarch64` | 3.6-3.11
+`linux` | `centos7` | `GCC 10.2.1`| `x86_64` | 3.6-3.12
+`linux` | `centos7` | `GCC 10.2.1`| `aarch64` | 3.6-3.12
+`linux` | `centos7` | `GCC 10.2.1`| `ppc64le` | 3.6-3.12
+`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.0` | `x86_64` | 3.6-3.12
+`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.3` | `aarch64` | 3.6-3.12
 
 ## Github Actions Workflows
 
