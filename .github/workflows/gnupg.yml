@@ -50,7 +50,7 @@ jobs:
 
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
           spack install gnupg cflags="-mmacosx-version-min=10.13" target=${{ matrix.runner[1] }}
-          spack buildcache push -a -u -f $PWD/binary-mirror gnupg
+          spack buildcache push --unsigned --force $PWD/binary-mirror gnupg
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror

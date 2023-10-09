@@ -45,7 +45,7 @@ jobs:
           . spack-src/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
-          spack buildcache push -a -u -f $PWD/binary-mirror clingo-bootstrap
+          spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
@@ -90,7 +90,7 @@ jobs:
           . spack-src/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
-          spack buildcache push -a -u -f $PWD/binary-mirror clingo-bootstrap
+          spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
