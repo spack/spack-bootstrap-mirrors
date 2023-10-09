@@ -35,6 +35,7 @@ jobs:
           fi
           brew install gawk perl
           git clone https://github.com/spack/spack.git spack-src
+          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && cd ..
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
