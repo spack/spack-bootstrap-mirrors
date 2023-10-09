@@ -29,10 +29,10 @@ SPEC_INFO = {
     ('centos7', 'ppc64le'): {
         'spec': 'clingo-bootstrap%gcc platform=linux target=ppc64le',
     },
-    ('bigsur', 'x86_64'): {
+    ('monterey', 'x86_64'): {
         'spec': 'clingo-bootstrap%apple-clang platform=darwin target=x86_64',        
     },
-    ('monterey', 'aarch64'): {
+    ('ventura', 'aarch64'): {
         'spec': 'clingo-bootstrap%apple-clang platform=darwin target=aarch64',        
     }
 }
@@ -70,9 +70,12 @@ glob_expr = './build_cache/*.json'
 spec_yaml_files = glob.glob(glob_expr)
 
 mirror_info = []
-for spec_yaml in spec_yaml_files:
+for spec_json in spec_yaml_files:
+    if "clingo" not in spec_json:
+        continue
+
     # Get the raw data from spec.json
-    with open(spec_yaml) as f:
+    with open(spec_json) as f:
         spec_yaml_data = json.load(f)['spec']['nodes']
 
     # Cycle through the specs in raw data. We are only interested 

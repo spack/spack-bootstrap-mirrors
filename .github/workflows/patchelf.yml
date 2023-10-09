@@ -51,11 +51,9 @@ jobs:
           file: ./patchelf/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le,linux/amd64
           pull: ${{ github.event_name == 'pull_request' }}
-          # Self-hosted runners use the local cache
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
-          cache-from: type=local,src=/tmp/.buildx-cache-patchelf-manylinux2014
-          cache-to: type=local,dest=/tmp/.buildx-cache-patchelf-manylinux2014,mode=max
+          cache-from: |
+            ${{ steps.docker_meta.outputs.tags }}
+          cache-to: type=inline
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}

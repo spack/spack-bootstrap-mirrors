@@ -1,20 +1,20 @@
 diff --git a/var/spack/repos/builtin/packages/gnupg/package.py b/var/spack/repos/builtin/packages/gnupg/package.py
-index 6d9b89b72a..d80d042c88 100644
+index 6e512a105e..5d4a96beaf 100644
 --- a/var/spack/repos/builtin/packages/gnupg/package.py
 +++ b/var/spack/repos/builtin/packages/gnupg/package.py
-@@ -142,6 +142,7 @@ def configure_args(self):
-             "--with-zlib=" + self.spec["zlib"].prefix,
+@@ -146,6 +146,7 @@ def configure_args(self):
+             "--disable-regex",
+             "--with-zlib=" + self.spec["zlib-api"].prefix,
              "--without-tar",
-             "--without-libiconv-prefix",
 +            "--without-libintl-prefix",
              "--without-readline",
          ]
  
 diff --git a/var/spack/repos/builtin/packages/libgpg-error/package.py b/var/spack/repos/builtin/packages/libgpg-error/package.py
-index 8b6924492f..42c9276516 100644
+index e2eeb228b4..23282a2883 100644
 --- a/var/spack/repos/builtin/packages/libgpg-error/package.py
 +++ b/var/spack/repos/builtin/packages/libgpg-error/package.py
-@@ -35,6 +35,8 @@ def configure_args(self):
+@@ -36,6 +36,8 @@ def configure_args(self):
          args = [
              "--enable-static",
              "--enable-shared",
