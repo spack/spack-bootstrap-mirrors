@@ -135,6 +135,7 @@ jobs:
           file: ./clingo/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le,linux/amd64
           cache-from: |
+            ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014:main
             ${{ steps.docker_meta.outputs.tags }}
           cache-to: type=inline
           pull: ${{ github.event_name == 'pull_request' }}
