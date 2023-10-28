@@ -23,7 +23,7 @@ jobs:
       spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Setup tags to be used for docker images
       - uses: docker/metadata-action@v5
@@ -66,7 +66,7 @@ jobs:
       SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           . ./patchelf/scripts/copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ upload-manylinux2014 ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
