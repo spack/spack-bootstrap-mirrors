@@ -47,7 +47,7 @@ jobs:
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
           spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: clingo_binary_mirror
           path: binary-mirror
@@ -93,7 +93,7 @@ jobs:
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
           spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: clingo_binary_mirror
           path: binary-mirror
@@ -152,7 +152,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           . ./clingo/scripts/copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: clingo_binary_mirror
           path: |
@@ -172,7 +172,7 @@ jobs:
       - run: |
           pip install ruamel.yaml
           python clingo/scripts/clingo_json.py
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: clingo_manifest
           path: |
