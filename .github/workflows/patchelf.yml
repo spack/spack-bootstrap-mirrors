@@ -17,6 +17,7 @@ concurrency:
 
 env:
   SPACK_COLOR: always
+  SPACK_BACKTRACE: please
 
 jobs:
   manylinux2014:
