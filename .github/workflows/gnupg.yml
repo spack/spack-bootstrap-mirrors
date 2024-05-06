@@ -114,13 +114,15 @@ jobs:
     needs: [ upload-manylinux2014, macos_gnupg ]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack
+          ref: 9b4ca0be40edb02115be94bbc428ac546d63030e
+          path: spack
       - uses: actions/download-artifact@v3
         with:
           name: gnupg_binary_mirror
-      - run: |
-          git clone -q https://github.com/spack/spack.git
-          . spack/share/spack/setup-env.sh
-          spack python gnupg/scripts/gnupg_json.py
+      - run: ./spack/bin/spack python gnupg/scripts/gnupg_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_manifest
