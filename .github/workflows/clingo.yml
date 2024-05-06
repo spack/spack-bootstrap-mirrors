@@ -33,7 +33,7 @@ jobs:
           repository: spack/spack
           ref: 9b4ca0be40edb02115be94bbc428ac546d63030e
           path: spack
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Prepare Spack
@@ -48,7 +48,7 @@ jobs:
           . spack/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
           path: binary-mirror
@@ -105,7 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./contrib/copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
           path: binary-mirror
@@ -115,11 +115,11 @@ jobs:
     needs: [ upload-manylinux2014, macos_clingo_x86_64, macos_clingo_aarch64 ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: clingo_binary_mirror
       - run: python3 clingo/scripts/clingo_json.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: clingo_manifest
           path: clingo.json
