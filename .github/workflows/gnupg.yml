@@ -35,8 +35,8 @@ jobs:
 
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
-          spack config add "config:concretizer:original"
-          spack config add "config:install_tree:padded_length:256"
+          spack config add config:concretizer:original
+          spack config add config:install_tree:padded_length:256
           mkdir -p binary-mirror
 
           # Inject flags to have compatibility with MacOSX version 10.13 or higher

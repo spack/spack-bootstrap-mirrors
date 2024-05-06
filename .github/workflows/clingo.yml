@@ -35,7 +35,7 @@ jobs:
           git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
-          spack config add "config:install_tree:padded_length:256"
+          spack config add config:install_tree:padded_length:256
       - name: Install clingo
         run: |
           . spack/share/spack/setup-env.sh
