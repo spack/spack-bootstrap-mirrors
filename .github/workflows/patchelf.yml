@@ -15,8 +15,10 @@ concurrency:
   group: patchelf-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
+env:
+  SPACK_COLOR: always
 
+jobs:
   manylinux2014:
     runs-on: ubuntu-20.04
     outputs:
