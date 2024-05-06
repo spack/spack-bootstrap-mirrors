@@ -17,30 +17,21 @@ concurrency:
 
 jobs:
   macos_gnupg:
-    runs-on: ${{ matrix.runner[0] }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      # List of:
-      # 1. Runners
-      # 2. Target architectures
       matrix:
-        runner: [
-          ["macos-latest", "x86_64"], 
-          [["self-hosted", "macOS", "ARM64"], "aarch64"]
-        ]
+        os: ["macos-12", "macos-14"]
     steps:
       - uses: actions/checkout@v4
       - run: |
-          if [[ ${{ matrix.runner[1] }} == "aarch64" ]] ; then
-              export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          fi
           brew install gawk perl
           git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && cd ..
+          git -C spack-src checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          cd spack-src && git apply ../gnupg/patches/gnupg_macos.patch && cd ..    
+          git -C spack-src apply gnupg/patches/gnupg_macos.patch
 
           . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
@@ -49,7 +40,7 @@ jobs:
           mkdir -p binary-mirror
 
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
-          spack install gnupg cflags="-mmacosx-version-min=10.13" target=${{ matrix.runner[1] }}
+          spack install gnupg cflags="-mmacosx-version-min=10.13"
           spack buildcache push --unsigned --force $PWD/binary-mirror gnupg
       - uses: actions/upload-artifact@v3
         with:

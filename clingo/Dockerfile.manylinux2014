@@ -11,9 +11,7 @@ WORKDIR /home/spack
 
 # Clone the repo and install Spack
 RUN git clone https://www.github.com/spack/spack.git && \
-    cd spack && \
-    git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && \
-    cd ..
+    git -C spack-src checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
 
 # Set externals, locate compilers
 RUN ${SPACK_CMD} external find -j 1 --not-buildable bison cmake
