@@ -27,6 +27,11 @@ jobs:
         os: ["macos-12", "macos-14"]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack
+          ref: 9b4ca0be40edb02115be94bbc428ac546d63030e
+          path: spack
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -34,8 +39,6 @@ jobs:
         run: |
           brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
-          git clone -q https://github.com/spack/spack.git
-          git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
           spack config add config:install_tree:padded_length:256
