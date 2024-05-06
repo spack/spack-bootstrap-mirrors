@@ -31,7 +31,7 @@ SPEC_INFO = {
     ('monterey', 'x86_64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=x86_64',        
     },
-    ('ventura', 'aarch64'): {
+    ('sonoma', 'aarch64'): {
         'spec': 'gnupg@2.3: %apple-clang platform=darwin target=aarch64',        
     }
 }
