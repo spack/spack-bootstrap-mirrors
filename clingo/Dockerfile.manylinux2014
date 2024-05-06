@@ -25,5 +25,4 @@ RUN ./bootstrap_clingo2014.sh 310
 RUN ./bootstrap_clingo2014.sh 311
 RUN ./bootstrap_clingo2014.sh 312
 
-RUN mkdir -p /root/binary-mirror \
-    spack buildcache push --unsigned ./binary-mirror $(spack find --format="/{hash}" clingo-bootstrap)
+RUN spack buildcache push --unsigned ./binary-mirror $(spack find --format="/{hash}" clingo-bootstrap)
