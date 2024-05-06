@@ -101,17 +101,13 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
-          path: |
-            binary-mirror
+          path: binary-mirror
 
   gnupg_json:
     runs-on: ubuntu-latest
     needs: [ upload-manylinux2014, macos_gnupg ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
       - uses: actions/download-artifact@v3
         with:
           name: gnupg_binary_mirror
@@ -122,5 +118,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_manifest
-          path: |
-            gnupg.json
+          path: gnupg.json

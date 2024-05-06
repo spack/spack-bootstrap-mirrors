@@ -72,25 +72,18 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_binary_mirror
-          path: |
-            binary-mirror
+          path: binary-mirror
 
   patchelf_json:
     runs-on: ubuntu-latest
     needs: [ upload-manylinux2014 ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
       - uses: actions/download-artifact@v3
         with:
           name: patchelf_binary_mirror
-      - run: |
-          pip install ruamel.yaml
-          python patchelf/scripts/patchelf_json.py
+      - run: python3 patchelf/scripts/patchelf_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_manifest
-          path: |
-            patchelf.json
+          path: patchelf.json
