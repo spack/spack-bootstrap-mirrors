@@ -4,16 +4,12 @@ ENV SPACK_PYTHON="/opt/python/cp311-cp311/bin/python"
 ENV PATH="/root/spack/bin:${PATH}"
 WORKDIR /root
 
-# Clone the repo and install Spack
 RUN git clone https://github.com/spack/spack.git && \
     git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
-
-# Set externals, locate compilers
 RUN spack external find --not-buildable gawk perl
 RUN spack compiler find
-
+RUN spack config add config:install_tree:padded_length:256
 RUN spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
-RUN spack -c config:install_tree:padded_length:256 install gnupg "target=$(cat target.txt)"
-
+RUN spack -c install gnupg "target=$(cat target.txt)"
 RUN mkdir -p /home/spack/binary-mirror && \
-    spack -c config:install_tree:padded_length:256 buildcache push --unsigned --force /home/spack/binary-mirror gnupg "target=$(cat target.txt)"
+    spack -c buildcache push --unsigned --force /home/spack/binary-mirror gnupg "target=$(cat target.txt)"
