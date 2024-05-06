@@ -9,7 +9,7 @@ WORKDIR /home/spack
 
 # Clone the repo and install Spack
 RUN git clone https://www.github.com/spack/spack.git && \
-    git -C spack-src checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
+    git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
 
 # Set externals, locate compilers
 RUN ${SPACK_CMD} external find --not-buildable gawk perl
