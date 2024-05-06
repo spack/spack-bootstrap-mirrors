@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./contrib/copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: patchelf_binary_mirror
           path: binary-mirror
@@ -81,11 +81,11 @@ jobs:
     needs: [ upload-manylinux2014 ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: patchelf_binary_mirror
       - run: python3 patchelf/scripts/patchelf_json.py
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: patchelf_manifest
           path: patchelf.json

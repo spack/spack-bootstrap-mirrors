@@ -49,7 +49,7 @@ jobs:
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
           spack install gnupg cflags="-mmacosx-version-min=10.13" "target=$(cat target.txt)"
           spack buildcache push --unsigned ./binary-mirror gnupg
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: gnupg_binary_mirror
           path: binary-mirror
@@ -105,7 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./contrib/copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: gnupg_binary_mirror
           path: binary-mirror
@@ -120,11 +120,11 @@ jobs:
           repository: spack/spack
           ref: 9b4ca0be40edb02115be94bbc428ac546d63030e
           path: spack
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: gnupg_binary_mirror
       - run: ./spack/bin/spack python gnupg/scripts/gnupg_json.py
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: gnupg_manifest
           path: gnupg.json
