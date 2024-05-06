@@ -11,5 +11,5 @@ RUN spack external find --not-buildable cmake
 RUN spack compiler find
 RUN spack config add config:install_tree:padded_length:256
 RUN spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
-RUN spack -c install patchelf "ldflags=-static-libstdc++ -static-libgcc" "target=$(cat target.txt)"
-RUN spack -c buildcache push --unsigned ./binary-mirror patchelf
+RUN spack install patchelf "ldflags=-static-libstdc++ -static-libgcc" "target=$(cat target.txt)"
+RUN spack buildcache push --unsigned ./binary-mirror patchelf
