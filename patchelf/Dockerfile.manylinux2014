@@ -2,7 +2,7 @@ FROM ghcr.io/spack/manylinux2014:v2023-10-03
 
 # Switch to a non-root user
 ENV SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
-ENV PATH="/root/spack/bin/spack:$PATH"
+ENV PATH="/root/spack/bin/spack:${PATH}"
 WORKDIR /root
 
 # Clone the repo and install Spack
