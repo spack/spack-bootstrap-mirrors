@@ -2,8 +2,8 @@
 
 for platform in amd64 arm64 ppc64le; do
     id="$(docker create --platform "linux/$platform" "${SPACK_MANYLINUX2014_TAG}")"
-    mkdir amd64
-    docker cp "$id:/root/binary-mirror" amd64/binary-mirror
+    mkdir "$platform"
+    docker cp "$id:/root/binary-mirror" "$platform/binary-mirror"
     docker rm -v "$id"
 done
 
