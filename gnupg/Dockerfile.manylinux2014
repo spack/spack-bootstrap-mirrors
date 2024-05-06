@@ -1,24 +1,14 @@
 FROM ghcr.io/spack/manylinux2014:v2023-10-03
 
-RUN adduser -m spack
+ENV SPACK_PYTHON="/opt/python/cp311-cp311/bin/python"
+ENV PATH="/root/spack/bin:${PATH}"
+WORKDIR /root
 
-# Switch to a non-root user
-USER spack
-ENV SPACK_CMD="/opt/python/cp311-cp311/bin/python /home/spack/spack/bin/spack"
-WORKDIR /home/spack
-
-# Clone the repo and install Spack
-RUN git clone https://www.github.com/spack/spack.git && \
-    cd spack && \
-    git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && \
-    cd ..
-
-# Set externals, locate compilers
-RUN ${SPACK_CMD} external find --not-buildable gawk perl
-RUN ${SPACK_CMD} compiler find
-
-RUN ${SPACK_CMD} python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
-RUN ${SPACK_CMD} -c  "config:install_tree:padded_length:256" install gnupg "target=$(cat target.txt)"
-
-RUN mkdir -p /home/spack/binary-mirror && \
-    ${SPACK_CMD} -c  "config:install_tree:padded_length:256" buildcache push --unsigned --force /home/spack/binary-mirror gnupg "target=$(cat target.txt)"
+RUN git clone -q https://github.com/spack/spack.git && \
+    git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
+RUN spack external find --not-buildable gawk perl
+RUN spack compiler find
+RUN spack config add config:install_tree:padded_length:256
+RUN spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
+RUN spack install gnupg "target=$(cat target.txt)"
+RUN spack buildcache push --unsigned ./binary-mirror gnupg "target=$(cat target.txt)"

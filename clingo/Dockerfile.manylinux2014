@@ -1,37 +1,28 @@
 FROM ghcr.io/spack/manylinux2014:v2023-10-03
 
-RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
+RUN tar -C /opt/_internal -xvf static-libs-for-embedding-only.tar.xz
 
-RUN adduser -m spack
+ENV SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
+ENV PATH="/root/spack/bin:${PATH}"
+WORKDIR /root
 
-# Switch to a non-root user
-USER spack
-ENV SPACK_CMD="/opt/python/cp311-cp311/bin/python /home/spack/spack/bin/spack"
-WORKDIR /home/spack
-
-# Clone the repo and install Spack
-RUN git clone https://www.github.com/spack/spack.git && \
-    cd spack && \
-    git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && \
-    cd ..
-
-# Set externals, locate compilers
-RUN ${SPACK_CMD} external find -j 1 --not-buildable bison cmake
-RUN ${SPACK_CMD} compiler find
-RUN ${SPACK_CMD} config add "config:concretizer:original"
-RUN ${SPACK_CMD} config add "config:install_tree:padded_length:256"
+RUN git clone -q https://github.com/spack/spack.git && \
+    git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
+RUN spack external find -j 1 --not-buildable bison cmake
+RUN spack compiler find
+RUN spack config add config:concretizer:original
+RUN spack config add config:install_tree:padded_length:256
 
 # Run a script to build all the versions of clingo we could
-COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux2014.sh /home/spack/bootstrap_clingo2014.sh
-COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
+COPY clingo/scripts/bootstrap_clingo_manylinux2014.sh /root/bootstrap_clingo2014.sh
+COPY clingo/scripts/install_clingo.py /root/install_clingo.py
 
-RUN ${HOME}/bootstrap_clingo2014.sh 36
-RUN ${HOME}/bootstrap_clingo2014.sh 37
-RUN ${HOME}/bootstrap_clingo2014.sh 38
-RUN ${HOME}/bootstrap_clingo2014.sh 39
-RUN ${HOME}/bootstrap_clingo2014.sh 310
-RUN ${HOME}/bootstrap_clingo2014.sh 311
-RUN ${HOME}/bootstrap_clingo2014.sh 312
+RUN ./bootstrap_clingo2014.sh 36
+RUN ./bootstrap_clingo2014.sh 37
+RUN ./bootstrap_clingo2014.sh 38
+RUN ./bootstrap_clingo2014.sh 39
+RUN ./bootstrap_clingo2014.sh 310
+RUN ./bootstrap_clingo2014.sh 311
+RUN ./bootstrap_clingo2014.sh 312
 
-COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
-RUN ${HOME}/create_binary_mirror.sh
+RUN spack buildcache push --unsigned ./binary-mirror $(spack find --format="/{hash}" clingo-bootstrap)

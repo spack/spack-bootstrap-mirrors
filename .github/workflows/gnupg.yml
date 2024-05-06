@@ -15,42 +15,40 @@ concurrency:
   group: gnupg-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SPACK_COLOR: always
+  SPACK_BACKTRACE: please
+
 jobs:
   macos_gnupg:
-    runs-on: ${{ matrix.runner[0] }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      # List of:
-      # 1. Runners
-      # 2. Target architectures
       matrix:
-        runner: [
-          ["macos-latest", "x86_64"], 
-          [["self-hosted", "macOS", "ARM64"], "aarch64"]
-        ]
+        os: ["macos-12", "macos-14"]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack
+          ref: 9b4ca0be40edb02115be94bbc428ac546d63030e
+          path: spack
       - run: |
-          if [[ ${{ matrix.runner[1] }} == "aarch64" ]] ; then
-              export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          fi
           brew install gawk perl
-          git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && cd ..
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          cd spack-src && git apply ../gnupg/patches/gnupg_macos.patch && cd ..    
+          git -C spack apply ../gnupg/patches/gnupg_macos.patch
 
-          . spack-src/share/spack/setup-env.sh
+          . spack/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
-          spack config add "config:concretizer:original"
-          spack config add "config:install_tree:padded_length:256"
-          mkdir -p binary-mirror
+          spack config add config:concretizer:original
+          spack config add config:install_tree:padded_length:256
+          spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
 
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
-          spack install gnupg cflags="-mmacosx-version-min=10.13" target=${{ matrix.runner[1] }}
-          spack buildcache push --unsigned --force $PWD/binary-mirror gnupg
+          spack install gnupg cflags="-mmacosx-version-min=10.13" "target=$(cat target.txt)"
+          spack buildcache push --unsigned ./binary-mirror gnupg
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
@@ -106,31 +104,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          . ./gnupg/scripts/copy_mirror_manylinux2014.sh
+      - run: ./contrib/copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
-          path: |
-            binary-mirror
+          path: binary-mirror
 
   gnupg_json:
     runs-on: ubuntu-latest
     needs: [ upload-manylinux2014, macos_gnupg ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
-          python-version: 3.11
+          repository: spack/spack
+          ref: 9b4ca0be40edb02115be94bbc428ac546d63030e
+          path: spack
       - uses: actions/download-artifact@v3
         with:
           name: gnupg_binary_mirror
-      - run: |
-          git clone https://github.com/spack/spack.git spack-src
-          . spack-src/share/spack/setup-env.sh
-          spack python gnupg/scripts/gnupg_json.py
+      - run: ./spack/bin/spack python gnupg/scripts/gnupg_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_manifest
-          path: |
-            gnupg.json
+          path: gnupg.json
