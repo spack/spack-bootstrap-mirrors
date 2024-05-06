@@ -97,8 +97,7 @@ jobs:
       SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          . ./clingo/scripts/copy_mirror_manylinux2014.sh
+      - run: ./contrib/copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
