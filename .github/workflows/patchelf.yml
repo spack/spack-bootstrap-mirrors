@@ -1,4 +1,4 @@
-name: "Patchelf"
+name: patchelf
 
 on:
   push:

@@ -47,7 +47,7 @@ jobs:
           spack config add config:install_tree:padded_length:256
           spack config add "packages:all:require:[target=$(cat target.txt)]"
           spack config blame
-      - name: Install clingo
+      - name: install
         run: |
           . spack/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py

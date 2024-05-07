@@ -1,4 +1,4 @@
-name: "GnuPG"
+name: gnupg
 
 on:
   push:
