@@ -6,7 +6,7 @@ ENV PATH="/root/spack/bin:${PATH}"
 WORKDIR /root
 
 RUN git clone -q https://github.com/spack/spack.git && \
-    git -C spack checkout -b docker-reference 9b4ca0be40edb02115be94bbc428ac546d63030e
+    git -C spack checkout -b docker-reference 540f9eefb70b86c8403868d28f88a68cec585ce3
 RUN spack external find --not-buildable cmake
 RUN spack compiler find
 RUN spack config add config:install_tree:padded_length:256
