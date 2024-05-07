@@ -1,5 +1,6 @@
 import sys
 
+import archspec.cpu
 import spack.bootstrap.config
 import spack.main
 
@@ -14,4 +15,4 @@ install = spack.main.SpackCommand("install")
 with spack.bootstrap.config.spack_python_interpreter():
     msg = "Installing clingo-bootstrap with Python: {0}"
     print(msg.format(spack.bootstrap.config.spec_for_current_python()))
-    install(CLINGO_BASE_SPEC)
+    install(f"{CLINGO_BASE_SPEC} target={archspec.cpu.host().family}")
