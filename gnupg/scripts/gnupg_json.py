@@ -57,6 +57,8 @@ for spec_json in spec_json_files:
     for edge in reversed(
         spack.traverse.traverse_edges_topo([s], direction="children", deptype=("link", "run"))
     ):
+        if edge.spec.external:
+            continue
         node = edge.spec
         binaries.append((node.name, node.dag_hash(), shas[node.dag_hash()]))
 
