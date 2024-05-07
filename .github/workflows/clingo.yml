@@ -36,13 +36,17 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Prepare Spack
+      - name: system dependencies
+        run: brew install bison
+      - name: configure
         run: |
-          brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
+          spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
           spack config add config:install_tree:padded_length:256
+          spack config add "packages:all:require:[target=$(cat target.txt)]"
+          spack config blame
       - name: Install clingo
         run: |
           . spack/share/spack/setup-env.sh

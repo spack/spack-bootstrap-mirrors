@@ -10,6 +10,7 @@ RUN git clone -q https://github.com/spack/spack.git && \
 RUN spack external find --not-buildable cmake
 RUN spack compiler find
 RUN spack config add config:install_tree:padded_length:256
-RUN spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
-RUN spack install patchelf "target=$(cat target.txt)"
+RUN spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt && \
+    spack config add "packages:all:require:[target=$(cat target.txt)]"
+RUN spack install patchelf
 RUN spack buildcache push --unsigned ./binary-mirror patchelf
