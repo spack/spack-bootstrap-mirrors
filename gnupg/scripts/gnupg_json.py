@@ -36,20 +36,6 @@ SPEC_INFO = {
     }
 }
 
-def compiler_entry(name, version, os, target):
-    return {
-        "spec": "{0}@{1}".format(name, version),
-        "paths": {
-          "cc": "/dev/null",
-          "cxx": "/dev/null",
-          "f77": "/dev/null",
-          "fc": "/dev/null"
-        },
-        "operating_system": "{0}".format(os),
-        "target": "{0}".format(target),
-        "modules": []
-    }
-
 def sha256(path):
     fn = hashlib.sha256()
     with open(path, "rb") as f:
