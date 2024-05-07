@@ -84,6 +84,8 @@ for spec_json in spec_json_files:
             [s], direction="children", deptype=("link", "run")
         )
     ):
+        if edge.spec.external:
+            continue
         node = edge.spec
         binaries.append((node.name, node.dag_hash(), shas[node.dag_hash()]))
 
