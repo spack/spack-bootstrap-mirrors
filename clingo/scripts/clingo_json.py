@@ -91,9 +91,6 @@ for spec_json in spec_yaml_files:
 
     python_version = binary_data['python']['version']
     python_spec = 'python@{0}'.format(python_version)
-    if python_version == '2.7':
-        ucs4 = binary_data['python']['parameters']['ucs4']
-        python_spec += '+ucs4' if ucs4 else '~ucs4'  
 
     current_hash = binary_data['clingo']['hash']
     mirror_entry = {
