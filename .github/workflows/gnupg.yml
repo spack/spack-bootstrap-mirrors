@@ -42,7 +42,6 @@ jobs:
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
           spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
-          spack config add config:concretizer:original
           spack config add config:install_tree:padded_length:256
           spack config add "packages:all:require:[target=$(cat target.txt)]"
           spack config blame
