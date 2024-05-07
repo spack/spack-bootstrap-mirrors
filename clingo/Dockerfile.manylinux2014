@@ -1,6 +1,6 @@
 FROM ghcr.io/spack/manylinux2014:v2023-10-03
 
-RUN tar -C /opt/_internal -xvf static-libs-for-embedding-only.tar.xz
+RUN tar -C /opt/_internal -xvf /opt/_internal/static-libs-for-embedding-only.tar.xz
 
 ENV SPACK_PYTHON=/opt/python/cp311-cp311/bin/python \
     SPACK_COLOR=always \
