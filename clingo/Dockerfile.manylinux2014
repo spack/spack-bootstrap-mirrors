@@ -2,8 +2,11 @@ FROM ghcr.io/spack/manylinux2014:v2023-10-03
 
 RUN tar -C /opt/_internal -xvf static-libs-for-embedding-only.tar.xz
 
-ENV SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
-ENV PATH="/root/spack/bin:${PATH}"
+ENV SPACK_PYTHON=/opt/python/cp311-cp311/bin/python \
+    SPACK_COLOR=always \
+    SPACK_BACKTRACE=please \
+    PATH="/root/spack/bin:${PATH}"
+
 WORKDIR /root
 
 RUN git clone -q https://github.com/spack/spack.git && \
