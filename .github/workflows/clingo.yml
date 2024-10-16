@@ -32,7 +32,7 @@ jobs:
           brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
           git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f
+          cd spack-src && git checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
           if [ ${{ matrix.python-version }} = "3.12" ] ; then
             # distutils -> setuptools patch
             wget -q -O - https://github.com/spack/spack/commit/1452e927719ddbbf07118e88f9fd8d18fabf0fae.patch | git apply -v             
@@ -73,7 +73,7 @@ jobs:
           pyenv exec pip install --upgrade pip
           
           git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f
+          cd spack-src && git checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
           if [ ${{ matrix.python-version }} = "3.12.0" ] ; then
             # distutils -> setuptools patch
             wget -q -O - https://github.com/spack/spack/commit/1452e927719ddbbf07118e88f9fd8d18fabf0fae.patch | git apply -v             

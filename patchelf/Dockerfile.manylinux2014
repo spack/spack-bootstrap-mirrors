@@ -8,10 +8,8 @@ ENV SPACK_CMD="/opt/python/cp311-cp311/bin/python /home/spack/spack/bin/spack"
 WORKDIR /home/spack
 
 # Clone the repo and install Spack
-RUN git clone https://www.github.com/spack/spack.git && \
-    cd spack && \
-    git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f && \
-    cd ..
+RUN git clone https://github.com/spack/spack.git && \
+    git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
 
 # Set externals, locate compilers
 RUN ${SPACK_CMD} external find --not-buildable cmake
