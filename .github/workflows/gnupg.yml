@@ -34,13 +34,13 @@ jobs:
               export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
           fi
           brew install gawk perl
-          git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e && cd ..
+          git clone https://github.com/spack/spack.git
+          git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          cd spack-src && git apply ../gnupg/patches/gnupg_macos.patch && cd ..    
+          git -C spack-src apply $PWD/gnupg/patches/gnupg_macos.patch
 
           . spack-src/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
@@ -50,7 +50,7 @@ jobs:
 
           # Inject flags to have compatibility with MacOSX version 10.13 or higher
           spack install gnupg cflags="-mmacosx-version-min=10.13" target=${{ matrix.runner[1] }}
-          spack buildcache push --unsigned --force $PWD/binary-mirror gnupg
+          spack buildcache push --unsigned --force ./binary-mirror gnupg
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
@@ -126,8 +126,8 @@ jobs:
         with:
           name: gnupg_binary_mirror
       - run: |
-          git clone https://github.com/spack/spack.git spack-src
-          . spack-src/share/spack/setup-env.sh
+          git clone https://github.com/spack/spack.git
+          . spack/share/spack/setup-env.sh
           spack python gnupg/scripts/gnupg_json.py
       - uses: actions/upload-artifact@v3
         with:
