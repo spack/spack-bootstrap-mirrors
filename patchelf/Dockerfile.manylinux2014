@@ -4,7 +4,8 @@ WORKDIR /root
 ENV PATH="/root/spack/bin/:$PATH" \
     SPACK_BACKTRACE=please \
     SPACK_COLOR=always \
-    SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
+    SPACK_PYTHON=/opt/python/cp311-cp311/bin/python \
+    PYTHONUNBUFFERED=1
 
 # Clone the repo and install Spack
 RUN git clone https://github.com/spack/spack.git && \

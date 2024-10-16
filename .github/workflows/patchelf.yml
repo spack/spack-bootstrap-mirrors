@@ -18,6 +18,7 @@ concurrency:
 env:
   SPACK_COLOR: always
   SPACK_BACKTRACE: please
+  PYTHONUNBUFFERED: 1
 
 jobs:
 
