@@ -3,7 +3,7 @@
 import glob
 import hashlib
 import json
-import os.path
+import os
 
 import spack.spec
 import spack.traverse

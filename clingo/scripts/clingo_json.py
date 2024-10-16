@@ -3,7 +3,7 @@
 import glob
 import hashlib
 import json
-import os.path
+import os
 
 # Each entry in clingo.json has the following keys:
 #
