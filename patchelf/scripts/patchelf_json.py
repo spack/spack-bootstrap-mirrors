@@ -15,27 +15,16 @@ import os
 
 # Dictionary that maps (OS, TARGET) to info for the spec
 SPEC_INFO = {
-    ("centos7", "x86_64"): {
-        "spec": "patchelf@0.13: %gcc platform=linux target=x86_64",
-    },
-    ("centos7", "aarch64"): {
-        "spec": "patchelf@0.13: %gcc platform=linux target=aarch64",
-    },
-    ("centos7", "ppc64le"): {
-        "spec": "patchelf@0.13: %gcc platform=linux target=ppc64le",
-    },
+    ("centos7", "x86_64"): {"spec": "patchelf@0.13: %gcc platform=linux target=x86_64"},
+    ("centos7", "aarch64"): {"spec": "patchelf@0.13: %gcc platform=linux target=aarch64"},
+    ("centos7", "ppc64le"): {"spec": "patchelf@0.13: %gcc platform=linux target=ppc64le"},
 }
 
 
 def compiler_entry(name, version, os, target):
     return {
         "spec": "{0}@{1}".format(name, version),
-        "paths": {
-            "cc": "/dev/null",
-            "cxx": "/dev/null",
-            "f77": "/dev/null",
-            "fc": "/dev/null",
-        },
+        "paths": {"cc": "/dev/null", "cxx": "/dev/null", "f77": "/dev/null", "fc": "/dev/null"},
         "operating_system": "{0}".format(os),
         "target": "{0}".format(target),
         "modules": [],
@@ -84,10 +73,7 @@ for spec_yaml in spec_yaml_files:
 
     current_hash = binary_data["patchelf"]["hash"]
     binaries = [("patchelf", current_hash, shas[current_hash])]
-    mirror_entry = {
-        "spec": SPEC_INFO[(current_os, current_target)]["spec"],
-        "binaries": binaries,
-    }
+    mirror_entry = {"spec": SPEC_INFO[(current_os, current_target)]["spec"], "binaries": binaries}
     mirror_info.append(mirror_entry)
 
 mirror_info = sorted(mirror_info, key=lambda x: x["spec"])

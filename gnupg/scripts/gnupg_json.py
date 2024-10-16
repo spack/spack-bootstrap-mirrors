@@ -18,33 +18,18 @@ import spack.traverse
 
 # Dictionary that maps (OS, TARGET) to info for the spec
 SPEC_INFO = {
-    ("centos7", "x86_64"): {
-        "spec": "gnupg@2.3: %gcc platform=linux target=x86_64",
-    },
-    ("centos7", "aarch64"): {
-        "spec": "gnupg@2.3: %gcc platform=linux target=aarch64",
-    },
-    ("centos7", "ppc64le"): {
-        "spec": "gnupg@2.3: %gcc platform=linux target=ppc64le",
-    },
-    ("monterey", "x86_64"): {
-        "spec": "gnupg@2.3: %apple-clang platform=darwin target=x86_64",
-    },
-    ("ventura", "aarch64"): {
-        "spec": "gnupg@2.3: %apple-clang platform=darwin target=aarch64",
-    },
+    ("centos7", "x86_64"): {"spec": "gnupg@2.3: %gcc platform=linux target=x86_64"},
+    ("centos7", "aarch64"): {"spec": "gnupg@2.3: %gcc platform=linux target=aarch64"},
+    ("centos7", "ppc64le"): {"spec": "gnupg@2.3: %gcc platform=linux target=ppc64le"},
+    ("monterey", "x86_64"): {"spec": "gnupg@2.3: %apple-clang platform=darwin target=x86_64"},
+    ("ventura", "aarch64"): {"spec": "gnupg@2.3: %apple-clang platform=darwin target=aarch64"},
 }
 
 
 def compiler_entry(name, version, os, target):
     return {
         "spec": "{0}@{1}".format(name, version),
-        "paths": {
-            "cc": "/dev/null",
-            "cxx": "/dev/null",
-            "f77": "/dev/null",
-            "fc": "/dev/null",
-        },
+        "paths": {"cc": "/dev/null", "cxx": "/dev/null", "f77": "/dev/null", "fc": "/dev/null"},
         "operating_system": "{0}".format(os),
         "target": "{0}".format(target),
         "modules": [],
@@ -80,9 +65,7 @@ for spec_json in spec_json_files:
     s = spack.spec.Spec.from_specfile(spec_json)
     binaries = []
     for edge in reversed(
-        spack.traverse.traverse_edges_topo(
-            [s], direction="children", deptype=("link", "run")
-        )
+        spack.traverse.traverse_edges_topo([s], direction="children", deptype=("link", "run"))
     ):
         if edge.spec.external:
             continue
@@ -110,10 +93,7 @@ for spec_json in spec_json_files:
         current_target = current_target["name"]
 
     current_hash = binary_data["gnupg"]["hash"]
-    mirror_entry = {
-        "spec": SPEC_INFO[(current_os, current_target)]["spec"],
-        "binaries": binaries,
-    }
+    mirror_entry = {"spec": SPEC_INFO[(current_os, current_target)]["spec"], "binaries": binaries}
     mirror_info.append(mirror_entry)
 
 mirror_info = sorted(mirror_info, key=lambda x: x["spec"])
