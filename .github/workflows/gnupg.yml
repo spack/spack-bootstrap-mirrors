@@ -40,9 +40,9 @@ jobs:
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          git -C spack-src apply $PWD/gnupg/patches/gnupg_macos.patch
+          git -C spack apply $PWD/gnupg/patches/gnupg_macos.patch
 
-          . spack-src/share/spack/setup-env.sh
+          . spack/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
           spack config add "config:concretizer:original"
           spack config add "config:install_tree:padded_length:256"
