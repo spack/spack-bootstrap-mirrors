@@ -15,7 +15,6 @@ RUN spack external find -j 1 --not-buildable bison cmake
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 
-COPY clingo/scripts/bootstrap_clingo_manylinux2014.sh /root/bootstrap_clingo2014.sh
 COPY clingo/scripts/install_clingo.py /root/install_clingo.py
 COPY clingo/scripts/create_binary_mirror.sh /root/create_binary_mirror.sh
 
