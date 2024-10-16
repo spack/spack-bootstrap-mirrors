@@ -1,6 +1,6 @@
 FROM ghcr.io/spack/manylinux2014:v2024-10-16
 
-RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
+RUN tar -C /opt/_internal -xvf /opt/_internal/static-libs-for-embedding-only.tar.xz
 
 WORKDIR /root
 ENV PATH="/root/spack/bin/:$PATH" \
