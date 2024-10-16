@@ -171,7 +171,7 @@ jobs:
           name: clingo_binary_mirror
       - run: |
           pip install ruamel.yaml
-          python clingo/scripts/clingo_json.py
+          python3 clingo/scripts/clingo_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_manifest
