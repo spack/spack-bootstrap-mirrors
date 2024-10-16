@@ -9,7 +9,4 @@ with spack.bootstrap.config.spack_python_interpreter():
         f"Installing clingo-bootstrap with Python: "
         f"{spack.bootstrap.config.spec_for_current_python()}"
     )
-    clingo_str = (
-        f"clingo-bootstrap@spack +optimized ~docs target={archspec.cpu.host().family}"
-    )
-    install(clingo_str)
+    install(f"clingo-bootstrap@spack +optimized ~docs target={archspec.cpu.host().family}")
