@@ -15,6 +15,10 @@ concurrency:
   group: patchelf-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SPACK_COLOR: always
+  SPACK_BACKTRACE: please
+
 jobs:
 
   manylinux2014:

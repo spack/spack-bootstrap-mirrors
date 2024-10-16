@@ -15,6 +15,10 @@ concurrency:
   group: gnupg-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SPACK_COLOR: always
+  SPACK_BACKTRACE: please
+
 jobs:
   macos_gnupg:
     runs-on: ${{ matrix.runner[0] }}

@@ -4,6 +4,8 @@ RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
 
 WORKDIR /root
 ENV PATH="/root/spack/bin/:$PATH" \
+    SPACK_BACKTRACE=please \
+    SPACK_COLOR=always \
     SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
 
 # Clone the repo and install Spack
@@ -26,4 +28,4 @@ RUN SPACK_PYTHON=/opt/python/cp38-cp38/bin/python3 spack python install_clingo.p
 RUN SPACK_PYTHON=/opt/python/cp37-cp37m/bin/python3 spack python install_clingo.py
 RUN SPACK_PYTHON=/opt/python/cp36-cp36m/bin/python3 spack python install_clingo.py
 
-RUN spack buildcache push --unsigned ./binary-mirror $(spack find --hashes clingo-bootstrap)
+RUN spack buildcache push --unsigned ./binary-mirror $(spack find --color=never --hashes clingo-bootstrap)

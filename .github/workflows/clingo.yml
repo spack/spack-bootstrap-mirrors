@@ -15,6 +15,10 @@ concurrency:
   group: clingo-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SPACK_COLOR: always
+  SPACK_BACKTRACE: please
+
 jobs:
   macos_clingo:
     runs-on: ${{ matrix.runner }}

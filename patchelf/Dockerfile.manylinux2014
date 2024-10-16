@@ -2,6 +2,8 @@ FROM ghcr.io/spack/manylinux2014:v2024-10-16
 
 WORKDIR /root
 ENV PATH="/root/spack/bin/:$PATH" \
+    SPACK_BACKTRACE=please \
+    SPACK_COLOR=always \
     SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
 
 # Clone the repo and install Spack
