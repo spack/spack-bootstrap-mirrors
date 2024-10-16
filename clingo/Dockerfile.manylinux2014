@@ -16,15 +16,14 @@ RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 
 COPY clingo/scripts/install_clingo.py /root/install_clingo.py
-COPY clingo/scripts/create_binary_mirror.sh /root/create_binary_mirror.sh
 
 RUN SPACK_PYTHON=/opt/python/cp313-cp313/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp312-cp312/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp311-cp311/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp310-cp310/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp39-cp39/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp38-cp38/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp37-cp37m/bin/python3 spack python install_clingo.py
-RUN SPACK_PYTHON=/opt/python/cp36-cp36m/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp312-cp312/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp311-cp311/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp310-cp310/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp39-cp39/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp38-cp38/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp37-cp37m/bin/python3 spack python install_clingo.py
+# RUN SPACK_PYTHON=/opt/python/cp36-cp36m/bin/python3 spack python install_clingo.py
 
-RUN /root/create_binary_mirror.sh
+RUN spack buildcache push --unsigned ./binary-mirror $(spack find --hashes clingo-bootstrap)
