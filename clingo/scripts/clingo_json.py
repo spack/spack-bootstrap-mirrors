@@ -20,10 +20,10 @@ SPEC_INFO = {
     ("centos7", "x86_64"): {"spec": "clingo-bootstrap%gcc platform=linux target=x86_64"},
     ("centos7", "aarch64"): {"spec": "clingo-bootstrap%gcc platform=linux target=aarch64"},
     ("centos7", "ppc64le"): {"spec": "clingo-bootstrap%gcc platform=linux target=ppc64le"},
-    ("monterey", "x86_64"): {"spec": "clingo-bootstrap%apple-clang platform=darwin target=x86_64"},
-    ("ventura", "aarch64"): {
-        "spec": "clingo-bootstrap%apple-clang platform=darwin target=aarch64"
+    ("highsierra", "x86_64"): {
+        "spec": "clingo-bootstrap%apple-clang platform=darwin target=x86_64"
     },
+    ("bigsur", "aarch64"): {"spec": "clingo-bootstrap%apple-clang platform=darwin target=aarch64"},
 }
 
 

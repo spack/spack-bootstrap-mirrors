@@ -21,11 +21,12 @@ env:
 
 jobs:
   macos_clingo:
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner[0] }}
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        runner: ["macos-13", "macos-14"]
+        # runner + macOS deployment target
+        runner: [["macos-13", "10.13"], ["macos-14", "11"]]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -33,6 +34,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Prepare Spack
         run: |
+          export MACOSX_DEPLOYMENT_TARGET=${{ matrix.runner[1] }}
           pip install --upgrade pip
           brew install bison
           export PATH="$(brew --prefix bison):$PATH"
