@@ -1,25 +1,25 @@
 diff --git a/var/spack/repos/builtin/packages/gnupg/package.py b/var/spack/repos/builtin/packages/gnupg/package.py
-index 6e512a105e..5d4a96beaf 100644
+index 859389b850..a6d00f2884 100644
 --- a/var/spack/repos/builtin/packages/gnupg/package.py
 +++ b/var/spack/repos/builtin/packages/gnupg/package.py
-@@ -146,6 +146,7 @@ def configure_args(self):
-             "--disable-regex",
-             "--with-zlib=" + self.spec["zlib-api"].prefix,
+@@ -85,6 +85,7 @@ def configure_args(self):
+             f"--with-zlib={self.spec['zlib-api'].prefix}",
              "--without-tar",
-+            "--without-libintl-prefix",
              "--without-readline",
++            "--without-libintl-prefix",
          ]
  
+         if self.spec.satisfies("@2:"):
 diff --git a/var/spack/repos/builtin/packages/libgpg-error/package.py b/var/spack/repos/builtin/packages/libgpg-error/package.py
-index e2eeb228b4..23282a2883 100644
+index 6b78a25423..e1e905fd9b 100644
 --- a/var/spack/repos/builtin/packages/libgpg-error/package.py
 +++ b/var/spack/repos/builtin/packages/libgpg-error/package.py
-@@ -36,6 +36,8 @@ def configure_args(self):
-         args = [
+@@ -51,6 +51,8 @@ def configure_args(self):
              "--enable-static",
              "--enable-shared",
+             "--enable-tests" if self.run_tests else "--disable-tests",
 +            "--without-libintl-prefix",
 +            "--disable-nls",
-             "--enable-tests" if self.run_tests else "--disable-tests",
          ]
          if self.spec.satisfies("@1.46:"):
+             args.append("--enable-install-gpg-error-config")
