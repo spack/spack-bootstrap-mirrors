@@ -2,34 +2,30 @@ FROM ghcr.io/spack/manylinux2014:v2024-10-16
 
 RUN cd /opt/_internal && tar xvf static-libs-for-embedding-only.tar.xz && cd -
 
-RUN adduser -m spack
-
-# Switch to a non-root user
-USER spack
-ENV SPACK_CMD="/opt/python/cp311-cp311/bin/python /home/spack/spack/bin/spack"
-WORKDIR /home/spack
+WORKDIR /root
+ENV PATH="/root/spack/bin/:$PATH" \
+    SPACK_PYTHON=/opt/python/cp311-cp311/bin/python
 
 # Clone the repo and install Spack
 RUN git clone https://github.com/spack/spack.git && \
     git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
 
 # Set externals, locate compilers
-RUN ${SPACK_CMD} external find -j 1 --not-buildable bison cmake
-RUN ${SPACK_CMD} compiler find
-RUN ${SPACK_CMD} config add "config:concretizer:original"
-RUN ${SPACK_CMD} config add "config:install_tree:padded_length:256"
+RUN spack external find -j 1 --not-buildable bison cmake
+RUN spack compiler find
+RUN spack config add "config:install_tree:padded_length:256"
 
 # Run a script to build all the versions of clingo we could
-COPY --chown=spack:spack clingo/scripts/bootstrap_clingo_manylinux2014.sh /home/spack/bootstrap_clingo2014.sh
-COPY --chown=spack:spack clingo/scripts/install_clingo.py /home/spack/install_clingo.py
+COPY clingo/scripts/bootstrap_clingo_manylinux2014.sh /root/bootstrap_clingo2014.sh
+COPY clingo/scripts/install_clingo.py /root/install_clingo.py
+COPY clingo/scripts/create_binary_mirror.sh /root/create_binary_mirror.sh
 
-RUN ${HOME}/bootstrap_clingo2014.sh 36
-RUN ${HOME}/bootstrap_clingo2014.sh 37
-RUN ${HOME}/bootstrap_clingo2014.sh 38
-RUN ${HOME}/bootstrap_clingo2014.sh 39
-RUN ${HOME}/bootstrap_clingo2014.sh 310
-RUN ${HOME}/bootstrap_clingo2014.sh 311
-RUN ${HOME}/bootstrap_clingo2014.sh 312
+RUN /root/bootstrap_clingo2014.sh 36
+RUN /root/bootstrap_clingo2014.sh 37
+RUN /root/bootstrap_clingo2014.sh 38
+RUN /root/bootstrap_clingo2014.sh 39
+RUN /root/bootstrap_clingo2014.sh 310
+RUN /root/bootstrap_clingo2014.sh 311
+RUN /root/bootstrap_clingo2014.sh 312
 
-COPY --chown=spack:spack clingo/scripts/create_binary_mirror.sh /home/spack/create_binary_mirror.sh
-RUN ${HOME}/create_binary_mirror.sh
+RUN /root/create_binary_mirror.sh
