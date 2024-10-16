@@ -67,8 +67,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          . ./patchelf/scripts/copy_mirror_manylinux2014.sh
+      - run: ./copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_binary_mirror

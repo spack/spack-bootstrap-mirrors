@@ -105,8 +105,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          . ./gnupg/scripts/copy_mirror_manylinux2014.sh
+      - run: ./copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_binary_mirror
