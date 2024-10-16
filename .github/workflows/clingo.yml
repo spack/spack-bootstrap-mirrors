@@ -31,19 +31,14 @@ jobs:
           pip install --upgrade pip
           brew install bison
           export PATH="/usr/local/opt/bison/bin:$PATH"
-          git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
-          if [ ${{ matrix.python-version }} = "3.12" ] ; then
-            # distutils -> setuptools patch
-            wget -q -O - https://github.com/spack/spack/commit/1452e927719ddbbf07118e88f9fd8d18fabf0fae.patch | git apply -v             
-          fi
-          cd ..
-          . spack-src/share/spack/setup-env.sh
+          git clone https://github.com/spack/spack.git
+          git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
+          . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
           spack config add "config:install_tree:padded_length:256"
       - name: Install clingo
         run: |
-          . spack-src/share/spack/setup-env.sh
+          . spack/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
           spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
@@ -65,21 +60,16 @@ jobs:
         run: |
           export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
           export PATH="$(pyenv prefix)/bin:$PATH"
-          python --version
+          python3 --version
           
           brew install cmake bison
           export PATH="/Users/spack-bootstrap-runner/homebrew/opt/bison/bin:$PATH"
           
           pyenv exec pip install --upgrade pip
           
-          git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
-          if [ ${{ matrix.python-version }} = "3.12.0" ] ; then
-            # distutils -> setuptools patch
-            wget -q -O - https://github.com/spack/spack/commit/1452e927719ddbbf07118e88f9fd8d18fabf0fae.patch | git apply -v             
-          fi
-          cd ..
-          . spack-src/share/spack/setup-env.sh
+          git clone https://github.com/spack/spack.git
+          git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
+          . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
           spack config add "config:install_tree:padded_length:256"
       - name: Install clingo
@@ -88,8 +78,8 @@ jobs:
         run: |
           export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
           export PATH="$(pyenv prefix)/bin:$PATH"
-          python --version
-          . spack-src/share/spack/setup-env.sh
+          python3 --version
+          . spack/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           mkdir -p binary-mirror
           spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
