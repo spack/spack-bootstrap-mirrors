@@ -13,9 +13,8 @@ RUN git clone https://github.com/spack/spack.git && \
 # Set externals, locate compilers
 RUN spack external find --not-buildable gawk perl
 RUN spack compiler find
+RUN spack config add "config:install_tree:padded_length:256"
 
 RUN spack python -c "import archspec.cpu;print(archspec.cpu.host().family)" > target.txt
-RUN spack -c  "config:install_tree:padded_length:256" install gnupg "target=$(cat target.txt)"
-
-RUN mkdir -p /root/binary-mirror && \
-    spack -c  "config:install_tree:padded_length:256" buildcache push --unsigned --force /root/binary-mirror gnupg "target=$(cat target.txt)"
+RUN spack install gnupg "target=$(cat target.txt)"
+RUN spack buildcache push --unsigned ./binary-mirror gnupg
