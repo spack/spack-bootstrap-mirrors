@@ -30,6 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
+          export MACOSX_DEPLOYMENT_TARGET=10.13
           brew install gawk perl
           git clone https://github.com/spack/spack.git
           git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
@@ -44,8 +45,7 @@ jobs:
           spack config add "config:concretizer:original"
           spack config add "config:install_tree:padded_length:256"
 
-          # Inject flags to have compatibility with MacOSX version 10.13 or higher
-          spack install gnupg cflags="-mmacosx-version-min=10.13" target=${{ matrix.runner[1] }}
+          spack install gnupg target=${{ matrix.runner[1] }}
           spack buildcache push --unsigned ./binary-mirror gnupg
       - uses: actions/upload-artifact@v3
         with:
