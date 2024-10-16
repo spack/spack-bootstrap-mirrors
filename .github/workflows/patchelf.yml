@@ -71,8 +71,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_binary_mirror
-          path: |
-            binary-mirror
+          path: binary-mirror
 
   patchelf_json:
     runs-on: ubuntu-latest
@@ -91,5 +90,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_manifest
-          path: |
-            patchelf.json
+          path: patchelf.json
