@@ -24,15 +24,12 @@ jobs:
       # 2. Target architectures
       matrix:
         runner: [
-          ["macos-latest", "x86_64"], 
-          [["self-hosted", "macOS", "ARM64"], "aarch64"]
+          ["macos-13", "x86_64"], 
+          ["macos-14", "aarch64"]
         ]
     steps:
       - uses: actions/checkout@v4
       - run: |
-          if [[ ${{ matrix.runner[1] }} == "aarch64" ]] ; then
-              export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          fi
           brew install gawk perl
           git clone https://github.com/spack/spack.git
           git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e

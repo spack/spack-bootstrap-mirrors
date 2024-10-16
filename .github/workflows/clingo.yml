@@ -16,11 +16,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos_clingo_x86_64:
-    runs-on: macos-latest
+  macos_clingo:
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        runner: ["macos-13", "macos-14"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -38,46 +39,6 @@ jobs:
           spack config add "config:install_tree:padded_length:256"
       - name: Install clingo
         run: |
-          . spack/share/spack/setup-env.sh
-          spack python clingo/scripts/install_clingo.py
-          spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
-      - uses: actions/upload-artifact@v3
-        with:
-          name: clingo_binary_mirror
-          path: binary-mirror
-
-  macos_clingo_aarch64:
-    runs-on: ["self-hosted", "macOS", "ARM64"]
-    strategy:
-      matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Prepare Spack
-        env:
-          PYENV_VERSION: ${{ matrix.python-version }}
-        run: |
-          export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          export PATH="$(pyenv prefix)/bin:$PATH"
-          python3 --version
-          
-          brew install cmake bison
-          export PATH="/Users/spack-bootstrap-runner/homebrew/opt/bison/bin:$PATH"
-          
-          pyenv exec pip install --upgrade pip
-          
-          git clone https://github.com/spack/spack.git
-          git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
-          . spack/share/spack/setup-env.sh
-          spack external find --not-buildable cmake bison
-          spack config add "config:install_tree:padded_length:256"
-      - name: Install clingo
-        env:
-          PYENV_VERSION: ${{ matrix.python-version }}
-        run: |
-          export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          export PATH="$(pyenv prefix)/bin:$PATH"
-          python3 --version
           . spack/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
@@ -146,7 +107,7 @@ jobs:
 
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_clingo_x86_64, macos_clingo_aarch64 ]
+    needs: [ upload-manylinux2014, macos_clingo ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
