@@ -20,12 +20,13 @@ COPY clingo/scripts/bootstrap_clingo_manylinux2014.sh /root/bootstrap_clingo2014
 COPY clingo/scripts/install_clingo.py /root/install_clingo.py
 COPY clingo/scripts/create_binary_mirror.sh /root/create_binary_mirror.sh
 
-RUN /root/bootstrap_clingo2014.sh 36
-RUN /root/bootstrap_clingo2014.sh 37
-RUN /root/bootstrap_clingo2014.sh 38
-RUN /root/bootstrap_clingo2014.sh 39
-RUN /root/bootstrap_clingo2014.sh 310
-RUN /root/bootstrap_clingo2014.sh 311
+RUN /root/bootstrap_clingo2014.sh 313
 RUN /root/bootstrap_clingo2014.sh 312
+RUN /root/bootstrap_clingo2014.sh 311
+RUN /root/bootstrap_clingo2014.sh 310
+RUN /root/bootstrap_clingo2014.sh 39
+RUN /root/bootstrap_clingo2014.sh 38
+RUN /root/bootstrap_clingo2014.sh 37
+RUN /root/bootstrap_clingo2014.sh 36
 
 RUN /root/create_binary_mirror.sh
