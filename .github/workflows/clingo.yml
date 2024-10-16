@@ -31,7 +31,7 @@ jobs:
         run: |
           pip install --upgrade pip
           brew install bison
-          export PATH="/usr/local/opt/bison/bin:$PATH"
+          export PATH="$(brew --prefix bison):$PATH"
           git clone https://github.com/spack/spack.git
           git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
           . spack/share/spack/setup-env.sh
