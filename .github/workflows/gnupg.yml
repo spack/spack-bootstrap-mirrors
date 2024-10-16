@@ -47,7 +47,6 @@ jobs:
 
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable gawk perl
-          spack config add "config:concretizer:original"
           spack config add "config:install_tree:padded_length:256"
 
           spack install gnupg target=${{ matrix.runner[1] }}
