@@ -42,6 +42,9 @@ jobs:
           repository: spack/spack
           path: spack
           ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
+      # See https://github.com/actions/setup-python/issues/960
+      - name: Workaround for broken Python versions from setup-python
+        run: brew install gettext zlib
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
