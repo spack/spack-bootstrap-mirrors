@@ -26,7 +26,7 @@ For completeness we report a summary of Spack requirements below:
 
 Name | Supported Versions | System Requirement | Requirement Reason
 --- | -------------------|---------------------|--------------------
-Python | 3.6-3.12 | Yes | Interpreter for Spack
+Python | 3.6-3.13 | Yes | Interpreter for Spack
 C/C++ compilers | - | Yes | Building software
 GNU make | - | Yes | Building software
 patch | - | Yes | Building software
@@ -53,11 +53,11 @@ by compatibility with the [manylinux](https://github.com/pypa/manylinux) project
 
 Platform | OS | Compiler Toolchain | Architecture | Python
 ---------|----|--------------------|--------------|-------
-`linux` | `centos7` | `GCC 10.2.1`| `x86_64` | 3.6-3.12
-`linux` | `centos7` | `GCC 10.2.1`| `aarch64` | 3.6-3.12
-`linux` | `centos7` | `GCC 10.2.1`| `ppc64le` | 3.6-3.12
-`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.0` | `x86_64` | 3.6-3.12
-`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.3` | `aarch64` | 3.6-3.12
+`linux` | `centos7` | `GCC 10.2.1`| `x86_64` | 3.6-3.13
+`linux` | `centos7` | `GCC 10.2.1`| `aarch64` | 3.6-3.13
+`linux` | `centos7` | `GCC 10.2.1`| `ppc64le` | 3.6-3.13
+`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.0` | `x86_64` | 3.6-3.13
+`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.3` | `aarch64` | 3.6-3.13
 
 ## Github Actions Workflows
 

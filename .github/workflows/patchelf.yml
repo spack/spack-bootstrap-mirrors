@@ -15,6 +15,11 @@ concurrency:
   group: patchelf-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SPACK_COLOR: always
+  SPACK_BACKTRACE: please
+  PYTHONUNBUFFERED: 1
+
 jobs:
 
   manylinux2014:
@@ -67,13 +72,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          . ./patchelf/scripts/copy_mirror_manylinux2014.sh
+      - run: ./copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_binary_mirror
-          path: |
-            binary-mirror
+          path: binary-mirror
 
   patchelf_json:
     runs-on: ubuntu-latest
@@ -88,9 +91,8 @@ jobs:
           name: patchelf_binary_mirror
       - run: |
           pip install ruamel.yaml
-          python patchelf/scripts/patchelf_json.py
+          python3 patchelf/scripts/patchelf_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: patchelf_manifest
-          path: |
-            patchelf.json
+          path: patchelf.json

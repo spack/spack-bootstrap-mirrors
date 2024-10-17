@@ -15,84 +15,50 @@ concurrency:
   group: clingo-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SPACK_COLOR: always
+  SPACK_BACKTRACE: please
+  PYTHONUNBUFFERED: 1
+
 jobs:
-  macos_clingo_x86_64:
-    runs-on: macos-latest
+  macos_clingo:
+    runs-on: ${{ matrix.runner[0] }}
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        # runner + macOS deployment target
+        runner: [["macos-13", "10.13"], ["macos-14", "11"]]
+        exclude:
+        - python-version: "3.6"
+          runner: ["macos-14", "11"]
+        - python-version: "3.7"
+          runner: ["macos-14", "11"]
+    env:
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack
+          path: spack
+          ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
+      # See https://github.com/actions/setup-python/issues/960
+      - name: Workaround for broken Python versions from setup-python
+        run: brew install gettext zlib
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Prepare Spack
+      - name: Install clingo-bootstrap
         run: |
           pip install --upgrade pip
           brew install bison
-          export PATH="/usr/local/opt/bison/bin:$PATH"
-          git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f
-          if [ ${{ matrix.python-version }} = "3.12" ] ; then
-            # distutils -> setuptools patch
-            wget -q -O - https://github.com/spack/spack/commit/1452e927719ddbbf07118e88f9fd8d18fabf0fae.patch | git apply -v             
-          fi
-          cd ..
-          . spack-src/share/spack/setup-env.sh
+          export PATH="$(brew --prefix bison):$PATH"
+          . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
           spack config add "config:install_tree:padded_length:256"
-      - name: Install clingo
-        run: |
-          . spack-src/share/spack/setup-env.sh
-          spack python clingo/scripts/install_clingo.py
-          mkdir -p binary-mirror
-          spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
-      - uses: actions/upload-artifact@v3
-        with:
-          name: clingo_binary_mirror
-          path: binary-mirror
 
-  macos_clingo_aarch64:
-    runs-on: ["self-hosted", "macOS", "ARM64"]
-    strategy:
-      matrix:
-        python-version: ["3.6.15", "3.7.14", "3.8.14", "3.9.14", "3.10.7", "3.11.5", "3.12.0"]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Prepare Spack
-        env:
-          PYENV_VERSION: ${{ matrix.python-version }}
-        run: |
-          export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          export PATH="$(pyenv prefix)/bin:$PATH"
-          python --version
-          
-          brew install cmake bison
-          export PATH="/Users/spack-bootstrap-runner/homebrew/opt/bison/bin:$PATH"
-          
-          pyenv exec pip install --upgrade pip
-          
-          git clone https://github.com/spack/spack.git spack-src
-          cd spack-src && git checkout -b docker-reference 08da9a854a53542e1f71d30ed8d14d6b7d18119f
-          if [ ${{ matrix.python-version }} = "3.12.0" ] ; then
-            # distutils -> setuptools patch
-            wget -q -O - https://github.com/spack/spack/commit/1452e927719ddbbf07118e88f9fd8d18fabf0fae.patch | git apply -v             
-          fi
-          cd ..
-          . spack-src/share/spack/setup-env.sh
-          spack external find --not-buildable cmake bison
-          spack config add "config:install_tree:padded_length:256"
-      - name: Install clingo
-        env:
-          PYENV_VERSION: ${{ matrix.python-version }}
-        run: |
-          export PATH=/Users/spack-bootstrap-runner/homebrew/bin:/Users/spack-bootstrap-runner/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-          export PATH="$(pyenv prefix)/bin:$PATH"
-          python --version
-          . spack-src/share/spack/setup-env.sh
           spack python clingo/scripts/install_clingo.py
-          mkdir -p binary-mirror
-          spack buildcache push --unsigned --force $PWD/binary-mirror clingo-bootstrap
+          spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
@@ -150,17 +116,15 @@ jobs:
       SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          . ./clingo/scripts/copy_mirror_manylinux2014.sh
+      - run: ./copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
-          path: |
-            binary-mirror
+          path: binary-mirror
 
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_clingo_x86_64, macos_clingo_aarch64 ]
+    needs: [ upload-manylinux2014, macos_clingo ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -171,9 +135,8 @@ jobs:
           name: clingo_binary_mirror
       - run: |
           pip install ruamel.yaml
-          python clingo/scripts/clingo_json.py
+          python3 clingo/scripts/clingo_json.py
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_manifest
-          path: |
-            clingo.json
+          path: clingo.json
