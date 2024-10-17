@@ -42,7 +42,8 @@ jobs:
           repository: spack/spack
           path: spack
           ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
-      - run: |
+      - name: Install gnupg
+        run: |
           brew install gawk perl
 
           # Disables internationalization to avoid linking to
