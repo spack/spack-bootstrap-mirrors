@@ -25,9 +25,9 @@ jobs:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.6", "3.7"]
         # runner + macOS deployment target
-        runner: [["macos-13", "10.13"], ["macos-14", "11"]]
+        runner: [["macos-13", "10.13"]]
         exclude:
         - python-version: "3.6"
           runner: ["macos-14", "11"]
@@ -56,84 +56,10 @@ jobs:
 
           spack python clingo/scripts/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
+      - name: Setup tmate
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_binary_mirror
           path: binary-mirror
-
-
-  manylinux2014:
-    runs-on: ["self-hosted", "Linux"]
-    outputs:
-      spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
-    permissions:
-      packages: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      # Setup tags to be used for docker images
-      - uses: docker/metadata-action@v5
-        id: docker_meta
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014
-
-      # Login to Github Packages
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: docker/setup-qemu-action@v3
-        id: qemu
-        with:
-          platforms: linux/ppc64le,linux/arm64
-
-      - uses: docker/setup-buildx-action@v3
-
-      # Build and eventually push to registry
-      - uses: docker/build-push-action@v5
-        with:
-          file: ./clingo/Dockerfile.manylinux2014
-          platforms: linux/arm64,linux/ppc64le,linux/amd64
-          cache-from: |
-            ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014:main
-            ${{ steps.docker_meta.outputs.tags }}
-          cache-to: type=inline
-          pull: ${{ github.event_name == 'pull_request' }}
-          push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-
-  upload-manylinux2014:
-    runs-on: ubuntu-latest
-    needs: [ manylinux2014 ]
-    env:
-      SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          name: clingo_binary_mirror
-          path: binary-mirror
-
-  clingo_json:
-    runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_clingo ]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-      - uses: actions/download-artifact@v3
-        with:
-          name: clingo_binary_mirror
-      - run: |
-          pip install ruamel.yaml
-          python3 clingo/scripts/clingo_json.py
-      - uses: actions/upload-artifact@v3
-        with:
-          name: clingo_manifest
-          path: clingo.json
