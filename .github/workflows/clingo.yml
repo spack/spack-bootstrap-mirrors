@@ -40,6 +40,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: spack/spack
+          path: spack
           ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
       - uses: actions/setup-python@v4
         with:
