@@ -1,4 +1,4 @@
-name: clingo
+name: "GnuPG"
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: clingo-${{ github.ref }}
+  group: gnupg-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -21,54 +21,46 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-  macos_clingo:
+  macos_gnupg:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
+      # List of:
+      # 1. Runners
+      # 2. Target architectures
+      # 3. macOS deployment target
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        # runner + macOS deployment target
-        runner: [["macos-13", "10.13"], ["macos-14", "11"]]
-        exclude:
-        - python-version: "3.6"
-          runner: ["macos-14", "11"]
-        - python-version: "3.7"
-          runner: ["macos-14", "11"]
-    env:
-      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
+        runner: [
+          ["macos-13", "x86_64", "10.13"],  # highsierra
+          ["macos-14", "aarch64", "11"]     # bigsur
+        ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: spack/spack
-          ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Prepare Spack
-        run: |
-          pip install --upgrade pip
-          brew install bison
-          export PATH="$(brew --prefix bison):$PATH"
+      - run: |
+          export MACOSX_DEPLOYMENT_TARGET=${{ matrix.runner[2] }}
+          brew install gawk perl
+          git clone https://github.com/spack/spack.git
+          git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
+
+          # Disables internationalization to avoid linking to
+          # libintl on MacOS, since that will make the binary
+          # non portable
+          git -C spack apply "$PWD/gnupg/patches/gnupg_macos.patch"
+
           . spack/share/spack/setup-env.sh
-          spack external find --not-buildable cmake bison
+          spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:256"
-      - name: Install clingo
-        run: |
-          . spack/share/spack/setup-env.sh
-          spack python clingo/scripts/install_clingo.py
-          spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
+
+          spack install gnupg target=${{ matrix.runner[1] }}
+          spack buildcache push --unsigned ./binary-mirror gnupg
       - uses: actions/upload-artifact@v3
         with:
-          name: clingo_binary_mirror
+          name: gnupg_binary_mirror
           path: binary-mirror
-
 
   manylinux2014:
     runs-on: ["self-hosted", "Linux"]
     outputs:
       spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
-    permissions:
-      packages: write
 
     steps:
       - uses: actions/checkout@v4
@@ -77,32 +69,32 @@ jobs:
       - uses: docker/metadata-action@v5
         id: docker_meta
         with:
-          images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014
+          images: ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014
 
       # Login to Github Packages
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/setup-qemu-action@v3
         id: qemu
         with:
-          platforms: linux/ppc64le,linux/arm64
+          platforms: linux/ppc64le,linux/arm64,linux/amd64
 
       - uses: docker/setup-buildx-action@v3
 
       # Build and eventually push to registry
       - uses: docker/build-push-action@v5
         with:
-          file: ./clingo/Dockerfile.manylinux2014
+          file: ./gnupg/Dockerfile.manylinux2014
           platforms: linux/arm64,linux/ppc64le,linux/amd64
+          pull: ${{ github.event_name == 'pull_request' }}
           cache-from: |
-            ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014:main
+            ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014:main
             ${{ steps.docker_meta.outputs.tags }}
           cache-to: type=inline
-          pull: ${{ github.event_name == 'pull_request' }}
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
@@ -112,29 +104,31 @@ jobs:
     needs: [ manylinux2014 ]
     env:
       SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
+
     steps:
       - uses: actions/checkout@v4
       - run: ./copy_mirror_manylinux2014.sh
       - uses: actions/upload-artifact@v3
         with:
-          name: clingo_binary_mirror
+          name: gnupg_binary_mirror
           path: binary-mirror
 
-  clingo_json:
+  gnupg_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_clingo ]
+    needs: [ upload-manylinux2014, macos_gnupg ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.11
       - uses: actions/download-artifact@v3
         with:
-          name: clingo_binary_mirror
+          name: gnupg_binary_mirror
       - run: |
-          pip install ruamel.yaml
-          python3 clingo/scripts/clingo_json.py
+          git clone https://github.com/spack/spack.git
+          . spack/share/spack/setup-env.sh
+          spack python gnupg/scripts/gnupg_json.py
       - uses: actions/upload-artifact@v3
         with:
-          name: clingo_manifest
-          path: clingo.json
+          name: gnupg_manifest
+          path: gnupg.json
