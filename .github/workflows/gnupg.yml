@@ -33,13 +33,16 @@ jobs:
           ["macos-13", "x86_64", "10.13"],  # highsierra
           ["macos-14", "aarch64", "11"]     # bigsur
         ]
+    env:
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[2] }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack
+          ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
       - run: |
-          export MACOSX_DEPLOYMENT_TARGET=${{ matrix.runner[2] }}
           brew install gawk perl
-          git clone https://github.com/spack/spack.git
-          git -C spack checkout -b docker-reference c710a1597f3566ab850d0ee8c82e71af04a08f9e
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary

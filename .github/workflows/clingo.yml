@@ -52,9 +52,7 @@ jobs:
           . spack/share/spack/setup-env.sh
           spack external find --not-buildable cmake bison
           spack config add "config:install_tree:padded_length:256"
-      - name: Install clingo
-        run: |
-          . spack/share/spack/setup-env.sh
+
           spack python clingo/scripts/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
       - uses: actions/upload-artifact@v3
