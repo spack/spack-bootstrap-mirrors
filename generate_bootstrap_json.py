@@ -6,7 +6,6 @@ import hashlib
 import json
 import os
 import sys
-from typing import Dict
 
 import spack.deptypes as dt
 import spack.spec
@@ -16,6 +15,7 @@ import spack.traverse
 #
 # "spec": root spec to be matched
 # "binaries": list of tuples (pkg name, dag hash, sha256 sum)
+
 
 def sha256(path):
     fn = hashlib.sha256()
