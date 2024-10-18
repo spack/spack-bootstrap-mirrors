@@ -127,15 +127,15 @@ jobs:
     needs: [ upload-manylinux2014, macos_clingo ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
-          python-version: 3.9
+          repository: spack/spack
+          path: spack
+          ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
       - uses: actions/download-artifact@v3
         with:
           name: clingo_binary_mirror
-      - run: |
-          pip install ruamel.yaml
-          python3 clingo/scripts/clingo_json.py
+      - run: ./spack/bin/spack python ./generate_bootstrap_json.py clingo
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_manifest
