@@ -1,7 +1,0 @@
-{
-    "centos7-x86_64": "clingo-bootstrap%gcc platform=linux target=x86_64",
-    "centos7-aarch64": "clingo-bootstrap%gcc platform=linux target=aarch64",
-    "centos7-ppc64le": "clingo-bootstrap%gcc platform=linux target=ppc64le",
-    "highsierra-x86_64": "clingo-bootstrap%apple-clang platform=darwin target=x86_64",
-    "bigsur-aarch64": "clingo-bootstrap%apple-clang platform=darwin target=aarch64"
-}
