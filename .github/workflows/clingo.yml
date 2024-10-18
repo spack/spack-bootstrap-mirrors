@@ -41,7 +41,7 @@ jobs:
         with:
           repository: spack/spack
           path: spack
-          ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
+          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
       # See https://github.com/actions/setup-python/issues/960
       - name: Workaround for broken Python versions from setup-python
         run: brew install gettext zlib
@@ -57,7 +57,7 @@ jobs:
           spack external find --not-buildable cmake bison
           spack config add "config:install_tree:padded_length:256"
 
-          spack python clingo/scripts/install_clingo.py
+          spack python clingo/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
       - uses: actions/upload-artifact@v3
         with:
@@ -127,15 +127,15 @@ jobs:
     needs: [ upload-manylinux2014, macos_clingo ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
-          python-version: 3.9
+          repository: spack/spack
+          path: spack
+          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
       - uses: actions/download-artifact@v3
         with:
           name: clingo_binary_mirror
-      - run: |
-          pip install ruamel.yaml
-          python3 clingo/scripts/clingo_json.py
+      - run: ./spack/bin/spack python ./generate_bootstrap_json.py clingo
       - uses: actions/upload-artifact@v3
         with:
           name: clingo_manifest

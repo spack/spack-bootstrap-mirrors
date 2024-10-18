@@ -41,7 +41,7 @@ jobs:
         with:
           repository: spack/spack
           path: spack
-          ref: c710a1597f3566ab850d0ee8c82e71af04a08f9e
+          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
       - name: Install gnupg
         run: |
           brew install gawk perl
@@ -127,15 +127,11 @@ jobs:
         with:
           repository: spack/spack
           path: spack
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
       - uses: actions/download-artifact@v3
         with:
           name: gnupg_binary_mirror
-      - run: |
-          . spack/share/spack/setup-env.sh
-          spack python gnupg/scripts/gnupg_json.py
+      - run: ./spack/bin/spack python ./generate_bootstrap_json.py gnupg
       - uses: actions/upload-artifact@v3
         with:
           name: gnupg_manifest

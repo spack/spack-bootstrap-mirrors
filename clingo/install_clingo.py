@@ -1,3 +1,5 @@
+#!/usr/bin/env spack-python
+
 import archspec.cpu
 import spack.bootstrap.config
 import spack.main
