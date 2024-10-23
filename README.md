@@ -57,7 +57,7 @@ Platform | Compatibility | Compiler Toolchain | Architecture | Python
 `linux` | `glibc 2.17` or later | `GCC 10.2.1`| `aarch64` | 3.6-3.13
 `linux` | `glibc 2.17` or later | `GCC 10.2.1`| `ppc64le` | 3.6-3.13
 `darwin`| `macOS 10.13` or later | `Apple Clang 15.0.0` | `x86_64` | 3.6-3.13
-`darwin`| `macOS 11` or later | `Apple Clang 15.0.0` | `aarch64` | 3.6-3.13
+`darwin`| `macOS 11` or later | `Apple Clang 15.0.0` | `aarch64` | 3.8-3.13
 
 ## Github Actions Workflows
 
