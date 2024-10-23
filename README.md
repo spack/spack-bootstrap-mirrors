@@ -51,13 +51,13 @@ A few different toolchains have been used to produce binaries depending
 on the target platform and architecture. Choices have been mainly driven
 by compatibility with the [manylinux](https://github.com/pypa/manylinux) project.
 
-Platform | OS | Compiler Toolchain | Architecture | Python
+Platform | Compatibility | Compiler Toolchain | Architecture | Python
 ---------|----|--------------------|--------------|-------
-`linux` | `centos7` | `GCC 10.2.1`| `x86_64` | 3.6-3.13
-`linux` | `centos7` | `GCC 10.2.1`| `aarch64` | 3.6-3.13
-`linux` | `centos7` | `GCC 10.2.1`| `ppc64le` | 3.6-3.13
-`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.0` | `x86_64` | 3.6-3.13
-`darwin`| `MacOS 10.13` or later | `Apple Clang 14.0.3` | `aarch64` | 3.6-3.13
+`linux` | `glibc 2.17` or later | `GCC 10.2.1`| `x86_64` | 3.6-3.13
+`linux` | `glibc 2.17` or later | `GCC 10.2.1`| `aarch64` | 3.6-3.13
+`linux` | `glibc 2.17` or later | `GCC 10.2.1`| `ppc64le` | 3.6-3.13
+`darwin`| `macOS 10.13` or later | `Apple Clang 15.0.0` | `x86_64` | 3.6-3.13
+`darwin`| `macOS 11` or later | `Apple Clang 15.0.0` | `aarch64` | 3.6-3.13
 
 ## Github Actions Workflows
 
