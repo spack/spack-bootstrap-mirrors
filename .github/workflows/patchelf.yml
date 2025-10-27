@@ -73,7 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v5
         with:
           name: patchelf_binary_mirror
           path: binary-mirror
@@ -92,7 +92,7 @@ jobs:
         with:
           name: patchelf_binary_mirror
       - run: ./spack/bin/spack python ./generate_bootstrap_json.py patchelf
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v5
         with:
           name: patchelf_manifest
           path: patchelf.json
