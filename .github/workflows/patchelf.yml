@@ -88,7 +88,7 @@ jobs:
           repository: spack/spack
           path: spack
           ref: d36452cf4e70fa1da8b9db43921850872b82ced9
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v6
         with:
           name: patchelf_binary_mirror
       - run: ./spack/bin/spack python ./generate_bootstrap_json.py patchelf
