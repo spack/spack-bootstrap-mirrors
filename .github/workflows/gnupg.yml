@@ -52,8 +52,12 @@ jobs:
           git -C spack apply "$PWD/gnupg/patches/gnupg_macos.patch"
 
           . spack/share/spack/setup-env.sh
+
+          rm -rf $(spack location -p podman)
+
           spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:256"
+
 
           spack install gnupg target=${{ matrix.runner[1] }}
           spack buildcache push --unsigned ./binary-mirror gnupg

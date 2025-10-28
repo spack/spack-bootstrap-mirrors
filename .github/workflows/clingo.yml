@@ -44,16 +44,18 @@ jobs:
           ref: 734c5db2121b01c373eed6538e452f18887e9e44
       # See https://github.com/actions/setup-python/issues/960
       - name: Workaround for broken Python versions from setup-python
-        run: brew install gettext zlib
+        run: brew install gettext zlib bison
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install clingo-bootstrap
         run: |
           pip install --upgrade pip
-          brew install bison
           export PATH="$(brew --prefix bison):$PATH"
           . spack/share/spack/setup-env.sh
+
+          rm -rf $(spack location -p podman)
+
           spack external find --not-buildable cmake bison
           spack config add "config:install_tree:padded_length:256"
 
