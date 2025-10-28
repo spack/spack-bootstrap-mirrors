@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-    tags:        
+    tags:
       - v0.**
   pull_request:
     branches:
@@ -21,7 +21,6 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-
   manylinux2014:
     runs-on: ubuntu-20.04
     outputs:
@@ -87,7 +86,7 @@ jobs:
         with:
           repository: spack/spack
           path: spack
-          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
+          ref: 734c5db2121b01c373eed6538e452f18887e9e44
       - uses: actions/download-artifact@v3
         with:
           name: patchelf_binary_mirror
