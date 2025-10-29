@@ -134,7 +134,7 @@ jobs:
           path: spack
           ref: 734c5db2121b01c373eed6538e452f18887e9e44
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v6
 
       - run: ./spack/bin/spack python ./generate_bootstrap_json.py clingo
       - uses: actions/upload-artifact@v5
