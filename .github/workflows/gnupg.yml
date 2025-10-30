@@ -42,6 +42,11 @@ jobs:
           repository: spack/spack
           path: spack
           ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack-packages
+          path: spack-packages
+          ref: 4b8bb3514838ce9e8bbc2ca7f98e62dbd7100c63
       - name: Install gnupg
         run: |
           brew install gawk perl
@@ -49,9 +54,10 @@ jobs:
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          git -C spack apply "$PWD/gnupg/patches/gnupg_macos.patch"
+          git -C spack-packages apply "$PWD/gnupg/patches/gnupg_macos.patch"
 
           . spack/share/spack/setup-env.sh
+          spack repo set --destination spack/var/spack/repos/builtin builtin
 
           rm -rf $(spack location -p podman)
 
