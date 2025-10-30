@@ -34,7 +34,7 @@ def run(pkg: str, deps=dt.NONE, python: bool = False):
     name = "clingo-bootstrap" if pkg == "clingo" else pkg
     shas = {
         tarball_hash(tarball): sha256(tarball)
-        for tarball in glob.glob("./clingo_binary_mirror*/**/*.spack", recursive=True)
+        for tarball in glob.glob(f"./{pkg}_binary_mirror*/**/*.spack", recursive=True)
     }
 
     specs = [
