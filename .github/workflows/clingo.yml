@@ -27,12 +27,12 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         # runner + macOS deployment target
-        runner: [["macos-13", "10.13"], ["macos-14", "11"]]
+        runner: [["macos-14", "14"], ["macos-15", "15"], ["macos-26", "26"]]
         exclude:
-        - python-version: "3.6"
-          runner: ["macos-14", "11"]
         - python-version: "3.7"
-          runner: ["macos-14", "11"]
+          runner: ["macos-14", "14"]
+        - python-version: "3.8"
+          runner: ["macos-15", "15"]
     env:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
     steps:

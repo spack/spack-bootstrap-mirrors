@@ -30,8 +30,9 @@ jobs:
       # 3. macOS deployment target
       matrix:
         runner: [
-          ["macos-13", "x86_64", "10.13"],  # highsierra
-          ["macos-14", "aarch64", "11"]     # bigsur
+          ["macos-14", "aarch64", "14"]
+          ["macos-14", "aarch64", "15"]
+          ["macos-26", "aarch64", "26"]
         ]
     env:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[2] }}
