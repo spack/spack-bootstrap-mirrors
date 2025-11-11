@@ -30,8 +30,8 @@ jobs:
       # 3. macOS deployment target
       matrix:
         runner: [
-          ["macos-14", "aarch64", "14"]
-          ["macos-14", "aarch64", "15"]
+          ["macos-14", "aarch64", "14"],
+          ["macos-15", "aarch64", "15"],
           ["macos-26", "aarch64", "26"]
         ]
     env:
