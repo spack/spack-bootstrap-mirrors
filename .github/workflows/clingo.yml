@@ -21,51 +21,51 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-  # macos_build:
-  #   runs-on: ${{ matrix.runner[0] }}
-  #   strategy:
-  #     matrix:
-  #       python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-  #       # runner + macOS deployment target
-  #       runner: [["macos-14", "14"], ["macos-15", "15"], ["macos-26", "26"]]
-  #       exclude:
-  #       - python-version: "3.8"
-  #         runner: ["macos-15", "15"]
-  #       - python-version: "3.8"
-  #         runner: ["macos-26", "26"]
-  #       - python-version: "3.9"
-  #         runner: ["macos-26", "26"]
-  #   env:
-  #     MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         repository: spack/spack
-  #         path: spack
-  #         ref: 734c5db2121b01c373eed6538e452f18887e9e44
-  #     # See https://github.com/actions/setup-python/issues/960
-  #     - name: Workaround for broken Python versions from setup-python
-  #       run: brew install gettext zlib
-  #     - uses: actions/setup-python@v4
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #     - name: Install clingo-bootstrap
-  #       run: |
-  #         pip install --upgrade pip
-  #         export PATH="$(brew --prefix bison):$PATH"
-  #         . spack/share/spack/setup-env.sh
+  macos_build:
+    runs-on: ${{ matrix.runner[0] }}
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        # runner + macOS deployment target
+        runner: [["macos-14", "14"], ["macos-15", "15"], ["macos-26", "26"]]
+        exclude:
+        - python-version: "3.8"
+          runner: ["macos-15", "15"]
+        - python-version: "3.8"
+          runner: ["macos-26", "26"]
+        - python-version: "3.9"
+          runner: ["macos-26", "26"]
+    env:
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack
+          path: spack
+          ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      # See https://github.com/actions/setup-python/issues/960
+      - name: Workaround for broken Python versions from setup-python
+        run: brew install gettext zlib
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install clingo-bootstrap
+        run: |
+          pip install --upgrade pip
+          export PATH="$(brew --prefix bison):$PATH"
+          . spack/share/spack/setup-env.sh
 
-  #         rm -rf $(spack location -p pod man)
+          rm -rf $(spack location -p pod man)
 
-  #         spack config add "config:install_tree:padded_length:256"
+          spack config add "config:install_tree:padded_length:256"
 
-  #         spack python clingo/install_clingo.py
-  #         spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
-  #     - uses: actions/upload-artifact@v5
-  #       with:
-  #         name: clingo_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.python-version }}
-  #         path: binary-mirror
+          spack python clingo/install_clingo.py
+          spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
+      - uses: actions/upload-artifact@v5
+        with:
+          name: clingo_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.python-version }}
+          path: binary-mirror
 
 
   manylinux2014_build:
@@ -101,22 +101,9 @@ jobs:
           name: clingo_binary_mirror-linux-${{ matrix.arch}}-${{ matrix.python-version }}
           path: binary-mirror
 
-  # manylinux2014_upload:
-  #   runs-on: ubuntu-latest
-  #   needs: [ manylinux2014_build ]
-  #   env:
-  #     SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - run: ./copy_mirror_manylinux2014.sh
-  #     - uses: actions/upload-artifact@v5
-  #       with:
-  #         name: clingo_binary_mirror-manylinux2014
-  #         path: binary-mirror
-
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ manylinux2014_build ]
+    needs: [ macos_build, manylinux2014_build ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
