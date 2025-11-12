@@ -21,7 +21,7 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-  macos_clingo:
+  macos_build:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
       matrix:
@@ -68,66 +68,66 @@ jobs:
           path: binary-mirror
 
 
-  # manylinux2014:
-  #   runs-on: ["self-hosted", "Linux"]
-  #   outputs:
-  #     spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
-  #   permissions:
-  #     packages: write
+  manylinux2014_build:
+    runs-on: "ubuntu-latest"
+    outputs:
+      spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
+    permissions:
+      packages: write
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     # Setup tags to be used for docker images
-  #     - uses: docker/metadata-action@v5
-  #       id: docker_meta
-  #       with:
-  #         images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014
+      # Setup tags to be used for docker images
+      - uses: docker/metadata-action@v5
+        id: docker_meta
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014
 
-  #     # Login to Github Packages
-  #     - uses: docker/login-action@v3
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
+      # Login to Github Packages
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - uses: docker/setup-qemu-action@v3
-  #       id: qemu
-  #       with:
-  #         platforms: linux/ppc64le,linux/arm64
+      - uses: docker/setup-qemu-action@v3
+        id: qemu
+        with:
+          platforms: linux/ppc64le,linux/arm64
 
-  #     - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
 
-  #     # Build and eventually push to registry
-  #     - uses: docker/build-push-action@v5
-  #       with:
-  #         file: ./clingo/Dockerfile.manylinux2014
-  #         platforms: linux/arm64,linux/ppc64le,linux/amd64
-  #         cache-from: |
-  #           ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014:main
-  #           ${{ steps.docker_meta.outputs.tags }}
-  #         cache-to: type=inline
-  #         pull: ${{ github.event_name == 'pull_request' }}
-  #         push: true
-  #         tags: ${{ steps.docker_meta.outputs.tags }}
-  #         labels: ${{ steps.docker_meta.outputs.labels }}
+      # Build and eventually push to registry
+      - uses: docker/build-push-action@v5
+        with:
+          file: ./clingo/Dockerfile.manylinux2014
+          platforms: linux/arm64,linux/ppc64le,linux/amd64
+          cache-from: |
+            ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014:main
+            ${{ steps.docker_meta.outputs.tags }}
+          cache-to: type=inline
+          pull: ${{ github.event_name == 'pull_request' }}
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
 
-  # upload-manylinux2014:
-  #   runs-on: ubuntu-latest
-  #   needs: [ manylinux2014 ]
-  #   env:
-  #     SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - run: ./copy_mirror_manylinux2014.sh
-  #     - uses: actions/upload-artifact@v5
-  #       with:
-  #         name: clingo_binary_mirror-ubuntu-latest
-  #         path: binary-mirror
+  manylinux2014_upload:
+    runs-on: ubuntu-latest
+    needs: [ manylinux2014_build ]
+    env:
+      SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./copy_mirror_manylinux2014.sh
+      - uses: actions/upload-artifact@v5
+        with:
+          name: clingo_binary_mirror-manylinux2014
+          path: binary-mirror
 
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ macos_clingo ]
+    needs: [ macos_build, manylinux2014_upload]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
