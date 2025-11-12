@@ -95,7 +95,7 @@ jobs:
           tags: gnupg:latest
 
       - run: |
-          docker create --name gnupg-c --platform linux/${{ matrix.arch }} clingo
+          docker create --name gnupg-c --platform linux/${{ matrix.arch }} gnupg
           docker cp "gnupg-c:/root/binary-mirror" binary-mirror
 
       - uses: actions/upload-artifact@v5
