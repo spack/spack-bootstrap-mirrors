@@ -87,6 +87,7 @@ jobs:
         with:
           file: ./clingo/Dockerfile.manylinux2014
           platforms: linux/${{ matrix.arch }}
+          outputs: type=docker
           tags: clingo:latest
           build-Args: |
             PYTHON_VERSION=${{ matrix.python-version }}
