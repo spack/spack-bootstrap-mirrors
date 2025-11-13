@@ -1,4 +1,4 @@
-FROM ghcr.io/spack/manylinux2014:v2025-11-12
+FROM quay.io/pypa/manylinux2014:2025.11.11-1
 
 ARG PYTHON_VERSION
 
@@ -21,6 +21,8 @@ RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 
 COPY clingo/install_clingo.py /root/install_clingo.py
+
+RUN ls /opt/python/
 
 RUN export PY_PATH=$(printf '%s' "$PYTHON_VERSION" | \
     awk -F. '{maj=$1; min=$2; suf=(maj*10+min<=37)?"m":""; printf "cp%d%d-cp%d%d%s\n", maj, min, maj, min, suf}') \
