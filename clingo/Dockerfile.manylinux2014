@@ -15,8 +15,11 @@ ENV PATH="/root/spack/bin/:$PATH" \
     PYTHONUNBUFFERED=1
 
 # Clone the repo and install Spack
-RUN git clone https://github.com/spack/spack.git && \
-    git -C spack checkout -b docker-reference 734c5db2121b01c373eed6538e452f18887e9e44
+RUN mkdir /root/spack && \
+    cd /root/spack && \
+    git init . && \
+    git fetch --depth=1 https://github.com/spack/spack.git 734c5db2121b01c373eed6538e452f18887e9e44:docker-reference && \
+    git checkout docker-reference
 
 # Set externals, locate compilers
 RUN spack external find -j 1 --not-buildable bison cmake
