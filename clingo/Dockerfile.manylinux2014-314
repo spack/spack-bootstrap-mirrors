@@ -16,7 +16,6 @@ RUN git clone https://github.com/spack/spack.git && \
     git -C spack checkout -b docker-reference 734c5db2121b01c373eed6538e452f18887e9e44
 
 # Set externals, locate compilers
-RUN spack external find -j 1 --not-buildable bison cmake
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 
