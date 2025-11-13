@@ -27,14 +27,9 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         # runner + macOS deployment target
-        runner: [["macos-14", "14"], ["macos-15", "15"], ["macos-26", "26"]]
-        exclude:
-        - python-version: "3.8"
-          runner: ["macos-15", "15"]
-        - python-version: "3.8"
-          runner: ["macos-26", "26"]
-        - python-version: "3.9"
-          runner: ["macos-26", "26"]
+        # we do not need to target multiple os releases of
+        # macos but use two here for x86 and aarch64 compatibly
+        runner: [["macos-15-intel", "11"], ["macos-14", "11"]]
     permissions:
       contents: read
       packages: write
