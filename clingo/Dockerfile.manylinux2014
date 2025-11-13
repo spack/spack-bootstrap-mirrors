@@ -1,4 +1,5 @@
-FROM ghcr.io/spack/manylinux2014:v2024-10-16
+ARG BASE_IMAGE=ghcr.io/spack/manylinux2014:v2024-10-16
+FROM ${BASE_IMAGE}
 
 ARG PYTHON_VERSION
 ARG GITHUB_ACTOR

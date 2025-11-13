@@ -64,6 +64,12 @@ jobs:
           spack python clingo/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
 
+      - name: Push to OCI registry
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          . spack/share/spack/setup-env.sh
           spack mirror add \
                 --oci-username-variable GITHUB_ACTOR \
                 --oci-password-variable GITHUB_TOKEN \
@@ -94,18 +100,22 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - name: set Dockerfile path
+      - name: set base image
         run: |
-          echo "DOCKERFILE=./clingo/Dockerfile.manylinux2014$([ '${{ matrix.python-version }}' = '3.14' ] \
-          && echo '-314')" >> $GITHUB_ENV
+          if [ '${{ matrix.python-version }}' = '3.14' ]; then
+            echo "BASE_IMAGE=quay.io/pypa/manylinux2014:2025.11.11-1" >> $GITHUB_ENV
+          else
+            echo "BASE_IMAGE=ghcr.io/spack/manylinux2014:v2024-10-16" >> $GITHUB_ENV
+          fi
 
       - uses: docker/build-push-action@v5
         with:
-          file: ${{ env.DOCKERFILE }}
+          file: ./clingo/Dockerfile.manylinux2014
           platforms: linux/${{ matrix.arch }}
           outputs: type=docker
           tags: clingo:latest
-          build-Args: |
+          build-args: |
+            BASE_IMAGE=${{ env.BASE_IMAGE }}
             PYTHON_VERSION=${{ matrix.python-version }}
             GITHUB_ACTOR=${{ github.actor }}
             GITHUB_TOKEN=${{ github.token }}
@@ -116,7 +126,7 @@ jobs:
 
       - uses: actions/upload-artifact@v5
         with:
-          name: clingo_binary_mirror-linux-${{ matrix.arch}}-${{ matrix.python-version }}
+          name: clingo_binary_mirror-linux-${{ matrix.arch }}-${{ matrix.python-version }}
           path: binary-mirror
 
   clingo_json:
