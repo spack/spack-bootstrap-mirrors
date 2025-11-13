@@ -60,12 +60,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install clingo-bootstrap
         run: |
-          pip install --upgrade pip
+          brew install bison
           export PATH="$(brew --prefix bison):$PATH"
           . spack/share/spack/setup-env.sh
 
           spack config add "config:install_tree:padded_length:256"
           spack repo set --destination "$PWD/spack-packages" builtin
+          spack external find cmake bison
 
           spack python clingo/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
