@@ -35,6 +35,9 @@ jobs:
           runner: ["macos-26", "26"]
         - python-version: "3.9"
           runner: ["macos-26", "26"]
+    permissions:
+      contents: read
+      packages: write
     env:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
     steps:
@@ -79,6 +82,9 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         arch: ["amd64", "arm64", "ppc64le"]
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
