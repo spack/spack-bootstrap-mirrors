@@ -56,12 +56,17 @@ jobs:
           export PATH="$(brew --prefix bison):$PATH"
           . spack/share/spack/setup-env.sh
 
-          rm -rf $(spack location -p pod man)
-
           spack config add "config:install_tree:padded_length:256"
 
           spack python clingo/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
+
+          spack mirror add \
+                --oci-username-variable GITHUB_ACTOR \
+                --oci-password-variable GITHUB_TOKEN \
+                ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr50
+          spack buildcache push --unsigned ghcr clingo-bootstrap
+
       - uses: actions/upload-artifact@v5
         with:
           name: clingo_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.python-version }}
@@ -96,6 +101,8 @@ jobs:
           tags: clingo:latest
           build-Args: |
             PYTHON_VERSION=${{ matrix.python-version }}
+            GITHUB_ACTOR=${{ github.actor }}
+            GITHUB_TOKEN=${{ github.token }}
 
       - run: |
           docker create --name clingo-c --platform linux/${{ matrix.arch }} clingo

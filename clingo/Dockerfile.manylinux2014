@@ -1,6 +1,8 @@
 FROM ghcr.io/spack/manylinux2014:v2024-10-16
 
 ARG PYTHON_VERSION
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
 
 RUN tar -C /opt/_internal -xvf /opt/_internal/static-libs-for-embedding-only.tar.xz
 
@@ -29,3 +31,9 @@ RUN export PY_PATH=$(printf '%s' "$PYTHON_VERSION" | \
     && SPACK_PYTHON=/opt/python/${PY_PATH}/bin/python3 spack python install_clingo.py
 
 RUN spack buildcache push --unsigned ./binary-mirror $(spack --color=never find --hashes clingo-bootstrap)
+
+RUN spack mirror add \
+      --oci-username-variable GITHUB_ACTOR \
+      --oci-password-variable GITHUB_TOKEN \
+      ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr50 && \
+      spack buildcache push --unsigned ghcr clingo-bootstrap
