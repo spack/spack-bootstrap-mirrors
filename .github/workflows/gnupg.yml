@@ -24,12 +24,12 @@ jobs:
   macos_build:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
+      max-parallel: 1
       # List of:
       # 1. Runners
       # 2. Target architectures
       # 3. macOS deployment target
       matrix:
-        max-parallel: 1
         runner: [
           ["macos-15-intel", "x86_64", "11"],
           ["macos-15", "aarch64", "11"],
