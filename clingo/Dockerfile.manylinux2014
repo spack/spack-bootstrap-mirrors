@@ -22,7 +22,7 @@ RUN mkdir /root/spack && \
     git checkout docker-reference
 
 # Set externals, locate compilers
-RUN spack external find -j 1 --not-buildable bison cmake
+RUN spack external find bison cmake
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 

@@ -14,8 +14,6 @@ RUN mkdir /root/spack && \
     git fetch --depth=1 https://github.com/spack/spack.git 734c5db2121b01c373eed6538e452f18887e9e44:docker-reference && \
     git checkout docker-reference
 
-# Set externals, locate compilers
-RUN spack external find --not-buildable cmake
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 
