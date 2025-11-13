@@ -71,6 +71,13 @@ jobs:
           spack python clingo/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
 
+          spack mirror add \
+            --oci-username=${{ github.actor }} \
+            --oci-password-variable=GITHUB_TOKEN \
+            ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51
+
+          spack buildcache push --unsigned ghcr clingo-bootstrap
+
       - uses: actions/upload-artifact@v5
         with:
           name: clingo_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.python-version }}
@@ -123,6 +130,14 @@ jobs:
       - run: |
           docker create --name clingo-c --platform linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }}
           docker cp "clingo-c:/root/binary-mirror" binary-mirror
+
+      - run: |
+          docker exec -e GITHUB_TOKEN=$GITHUB_TOKEN -e GITHUB_ACTOR=$GITHUB_ACTOR clingo-c \
+            spack mirror add \
+              --oci-username=${{ github.actor }} \
+              --oci-password-variable=GITHUB_TOKEN \
+              ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51 && \
+            spack buildcache push --unsigned ghcr clingo-bootstrap
 
       - uses: actions/upload-artifact@v5
         with:
