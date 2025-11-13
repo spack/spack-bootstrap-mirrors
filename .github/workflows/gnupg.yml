@@ -24,7 +24,6 @@ jobs:
   macos_build:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
-      max-parallel: 1
       # List of:
       # 1. Runners
       # 2. Target architectures
@@ -83,6 +82,7 @@ jobs:
   manylinux2014_build:
     runs-on: "ubuntu-latest"
     strategy:
+      max-parallel: 1
       matrix:
         arch: ["amd64", "arm64", "ppc64le"]
     permissions:
