@@ -95,23 +95,44 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - if: ${{ matrix.python-version == '3.14' }}
         run: echo "BASE_IMAGE=quay.io/pypa/manylinux2014:2025.11.11-1" >> $GITHUB_ENV
       - if: ${{ matrix.python-version != '3.14' }}
         run: echo "BASE_IMAGE=ghcr.io/spack/manylinux2014:v2024-10-16" >> $GITHUB_ENV
+
+      - name: Generate Docker metadata
+        id: docker_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/clingo-build
+          tags: |
+            type=ref,event=pr,suffix=-py${{ matrix.python-version }}-${{ matrix.arch }}
+            type=ref,event=branch,suffix=-py${{ matrix.python-version }}-${{ matrix.arch }}
+            type=semver,pattern={{version}},suffix=-py${{ matrix.python-version }}-${{ matrix.arch }}
+            type=raw,value=py${{ matrix.python-version }}-${{ matrix.arch }}
 
       - uses: docker/build-push-action@v5
         with:
           file: ./clingo/Dockerfile.manylinux2014
           platforms: linux/${{ matrix.arch }}
           outputs: type=docker
-          tags: clingo:latest
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/clingo-build:py${{ matrix.python-version }}-${{ matrix.arch }}
+          cache-to: type=inline
+          push: true
           build-args: |
             BASE_IMAGE=${{ env.BASE_IMAGE }}
             PYTHON_VERSION=${{ matrix.python-version }}
 
       - run: |
-          docker create --name clingo-c --platform linux/${{ matrix.arch }} clingo
+          docker create --name clingo-c --platform linux/${{ matrix.arch }} $(echo "${{ steps.docker_meta.outputs.tags }}" | head -n1)
           docker cp "clingo-c:/root/binary-mirror" binary-mirror
 
       - uses: actions/upload-artifact@v5
