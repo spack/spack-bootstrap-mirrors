@@ -132,12 +132,12 @@ jobs:
           docker cp "clingo-c:/root/binary-mirror" binary-mirror
 
       - run: |
-          docker exec -e GITHUB_TOKEN=$GITHUB_TOKEN -e GITHUB_ACTOR=$GITHUB_ACTOR clingo-c \
-            spack mirror add \
+          docker run -e GITHUB_TOKEN=$GITHUB_TOKEN -e GITHUB_ACTOR=$GITHUB_ACTOR ${{ steps.build.outputs.imageid }} \
+            /bin/bash -c "spack mirror add \
               --oci-username=${{ github.actor }} \
               --oci-password-variable=GITHUB_TOKEN \
               ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51 && \
-            spack buildcache push --unsigned ghcr clingo-bootstrap
+              spack buildcache push --unsigned ghcr clingo-bootstrap"
 
       - uses: actions/upload-artifact@v5
         with:
