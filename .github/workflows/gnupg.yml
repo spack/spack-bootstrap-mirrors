@@ -65,7 +65,6 @@ jobs:
           spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:256"
 
-
           spack install gnupg target=${{ matrix.runner[1] }}
           spack buildcache push --unsigned ./binary-mirror gnupg
       - uses: actions/upload-artifact@v5
