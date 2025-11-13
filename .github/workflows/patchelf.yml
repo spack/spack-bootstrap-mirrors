@@ -48,7 +48,7 @@ jobs:
 
       - uses: actions/upload-artifact@v5
         with:
-          name: patchelf_binary_mirror-linux-${{ matrix.arch}}-${{ matrix.python-version }}
+          name: patchelf_binary_mirror-linux-${{ matrix.arch }}
           path: binary-mirror
 
   patchelf_json:

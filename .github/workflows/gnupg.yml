@@ -70,7 +70,7 @@ jobs:
           spack buildcache push --unsigned ./binary-mirror gnupg
       - uses: actions/upload-artifact@v5
         with:
-          name: gnupg_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.runner[1] }}-${{ matrix.python-version }}
+          name: gnupg_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.runner[1] }}
           path: binary-mirror
 
   manylinux2014_build:
@@ -100,7 +100,7 @@ jobs:
 
       - uses: actions/upload-artifact@v5
         with:
-          name: gnupg_binary_mirror-linux-${{ matrix.arch}}-${{ matrix.python-version }}
+          name: gnupg_binary_mirror-linux-${{ matrix.arch }}
           path: binary-mirror
 
   gnupg_json:
