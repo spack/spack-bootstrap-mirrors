@@ -108,8 +108,6 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ env.BASE_IMAGE }}
             PYTHON_VERSION=${{ matrix.python-version }}
-            GITHUB_ACTOR=${{ github.actor }}
-            GITHUB_TOKEN=${{ github.token }}
 
       - run: |
           docker create --name clingo-c --platform linux/${{ matrix.arch }} clingo
