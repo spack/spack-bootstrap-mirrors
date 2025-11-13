@@ -36,8 +36,3 @@ RUN export PY_PATH=$(printf '%s' "$PYTHON_VERSION" | \
 
 RUN spack buildcache push --unsigned ./binary-mirror $(spack --color=never find --hashes clingo-bootstrap)
 
-RUN spack mirror add \
-      --oci-username-variable GITHUB_ACTOR \
-      --oci-password-variable GITHUB_TOKEN \
-      ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr50 && \
-    spack buildcache push --unsigned ghcr clingo-bootstrap
