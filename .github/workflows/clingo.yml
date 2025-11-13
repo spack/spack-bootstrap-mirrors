@@ -59,6 +59,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install clingo-bootstrap
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           brew install bison
           export PATH="$(brew --prefix bison):$PATH"
@@ -73,7 +75,7 @@ jobs:
 
           spack mirror add \
             --oci-username=${{ github.actor }} \
-            --oci-password-variable=GITHUB_TOKEN \
+            --oci-password-variable=GH_TOKEN \
             ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51
 
           spack buildcache push --unsigned ghcr clingo-bootstrap
@@ -132,12 +134,14 @@ jobs:
           docker cp "clingo-c:/root/binary-mirror" binary-mirror
 
       - run: |
-          docker run -e GITHUB_TOKEN=$GITHUB_TOKEN -e GITHUB_ACTOR=$GITHUB_ACTOR ${{ steps.build.outputs.imageid }} \
+          docker run -e GH_TOKEN=$GH_TOKEN ${{ steps.build.outputs.imageid }} \
             /bin/bash -c "spack mirror add \
               --oci-username=${{ github.actor }} \
-              --oci-password-variable=GITHUB_TOKEN \
+              --oci-password-variable=GH_TOKEN \
               ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51 && \
               spack buildcache push --unsigned ghcr clingo-bootstrap"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v5
         with:
