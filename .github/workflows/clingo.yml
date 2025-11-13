@@ -83,9 +83,14 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      - name: set Dockerfile path
+        run: |
+          echo "DOCKERFILE=./clingo/Dockerfile.manylinux2014$([ '${{ matrix.python-version }}' = '3.14' ] \
+          && echo '-314')" >> $GITHUB_ENV
+
       - uses: docker/build-push-action@v5
         with:
-          file: ./clingo/Dockerfile.manylinux2014
+          file: ${{ env.DOCKERFILE }}
           platforms: linux/${{ matrix.arch }}
           outputs: type=docker
           tags: clingo:latest
