@@ -132,12 +132,15 @@ jobs:
           path: spack-packages
           ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
       - uses: actions/download-artifact@v6
-
       - run: |
           . spack/share/spack/setup-env.sh
           spack repo set --destination "$PWD/spack-packages" builtin
           spack python ./generate_bootstrap_json.py gnupg
-
+      - uses: actions/upload-artifact/merge@v5
+        with:
+          name: gnupg_combined
+          pattern: gnupg_binary_mirror-*
+          delete-merged: true
       - uses: actions/upload-artifact@v5
         with:
           name: gnupg_manifest

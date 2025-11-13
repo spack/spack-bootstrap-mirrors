@@ -144,14 +144,16 @@ jobs:
           repository: spack/spack-packages
           path: spack-packages
           ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
-
       - uses: actions/download-artifact@v6
-
+      - uses: actions/upload-artifact/merge@v5
+        with:
+          name: clingo_combined
+          pattern: clingo_binary_mirror-*
+          delete-merged: true
       - run: |
           . spack/share/spack/setup-env.sh
           spack repo set --destination "$PWD/spack-packages" builtin
           spack python ./generate_bootstrap_json.py clingo
-
       - uses: actions/upload-artifact@v5
         with:
           name: clingo_manifest
