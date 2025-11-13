@@ -19,6 +19,5 @@ RUN spack external find --not-buildable cmake
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 
-RUN spack python -c "import spack.vendor.archspec.cpu;print(spack.vendor.archspec.cpu.host().family)" > target.txt
-RUN spack install patchelf "target=$(cat target.txt)"
+RUN spack install patchelf "target=$(spack arch --family --target)"
 RUN spack buildcache push --unsigned ./binary-mirror patchelf

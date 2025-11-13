@@ -40,4 +40,4 @@ RUN spack mirror add \
       --oci-username-variable GITHUB_ACTOR \
       --oci-password-variable GITHUB_TOKEN \
       ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr50 && \
-      spack buildcache push --unsigned ghcr clingo-bootstrap
+    spack buildcache push --unsigned ghcr clingo-bootstrap
