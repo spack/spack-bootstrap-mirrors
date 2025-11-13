@@ -73,7 +73,7 @@ jobs:
             --oci-password-variable=GH_TOKEN \
             ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51
 
-          spack buildcache push --unsigned ghcr clingo-bootstrap
+          spack buildcache push --unsigned ghcr gnupg
 
       - uses: actions/upload-artifact@v5
         with:
@@ -125,7 +125,7 @@ jobs:
               --oci-username=${{ github.actor }} \
               --oci-password-variable=GH_TOKEN \
               ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51 && \
-              spack buildcache push --unsigned ghcr clingo-bootstrap"
+              spack buildcache push --unsigned ghcr gnupg"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
