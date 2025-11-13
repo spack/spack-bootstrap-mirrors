@@ -14,6 +14,13 @@ RUN mkdir /root/spack && \
     git fetch --depth=1 https://github.com/spack/spack.git 734c5db2121b01c373eed6538e452f18887e9e44:docker-reference && \
     git checkout docker-reference
 
+RUN mkdir /root/spack-packages && \
+    cd /root/spack-packages && \
+    git init . && \
+    git fetch --depth=1 https://github.com/spack/spack-packages.git a5b98e6b7e411a499f310e048c1d2e39d1004519:docker-reference && \
+    git checkout docker-reference
+
+RUN spack repo set --destination /root/spack-packages builtin
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
 

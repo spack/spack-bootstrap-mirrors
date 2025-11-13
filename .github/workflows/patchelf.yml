@@ -61,9 +61,17 @@ jobs:
           repository: spack/spack
           path: spack
           ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack-packages
+          path: spack-packages
+          ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
       - uses: actions/download-artifact@v6
 
-      - run: ./spack/bin/spack python ./generate_bootstrap_json.py patchelf
+      - run: |
+          . spack/share/spack/setup-env.sh
+          spack repo set --destination "$PWD/spack-packages" builtin
+          spack python ./generate_bootstrap_json.py patchelf
 
       - uses: actions/upload-artifact@v5
         with:
