@@ -29,10 +29,10 @@ jobs:
       # 2. Target architectures
       # 3. macOS deployment target
       matrix:
+        max-parallel: 1
         runner: [
-          ["macos-14", "aarch64", "14"],
-          ["macos-15", "aarch64", "15"],
-          ["macos-26", "aarch64", "26"]
+          ["macos-15-intel", "x86_64", "11"],
+          ["macos-15", "aarch64", "11"],
         ]
     env:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[2] }}
@@ -49,6 +49,8 @@ jobs:
           path: spack-packages
           ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
       - name: Install gnupg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           brew install gawk perl
 
@@ -60,13 +62,19 @@ jobs:
           . spack/share/spack/setup-env.sh
           spack repo set --destination "$PWD/spack-packages" builtin
 
-          rm -rf $(spack location -p podman)
-
           spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:256"
 
           spack install gnupg target=${{ matrix.runner[1] }}
           spack buildcache push --unsigned ./binary-mirror gnupg
+
+          spack mirror add \
+            --oci-username=${{ github.actor }} \
+            --oci-password-variable=GH_TOKEN \
+            ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51
+
+          spack buildcache push --unsigned ghcr clingo-bootstrap
+
       - uses: actions/upload-artifact@v5
         with:
           name: gnupg_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.runner[1] }}
@@ -110,6 +118,16 @@ jobs:
       - run: |
           docker create --name gnupg-c --platform linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }}
           docker cp "gnupg-c:/root/binary-mirror" binary-mirror
+
+      - run: |
+          docker run -e GH_TOKEN=$GH_TOKEN ${{ steps.build.outputs.imageid }} \
+            /bin/bash -c "spack mirror add \
+              --oci-username=${{ github.actor }} \
+              --oci-password-variable=GH_TOKEN \
+              ghcr oci://ghcr.io/spack/bootstrap-buildcache-pr51 && \
+              spack buildcache push --unsigned ghcr clingo-bootstrap"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v5
         with:
