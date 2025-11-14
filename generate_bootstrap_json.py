@@ -72,18 +72,17 @@ def generate_json(pkg: str, deps=dt.NONE, python: bool = False) -> None:
     if not specs:
         raise ValueError(f"No specs found for {pkg}")
 
-    fmt_base = "{name}{@version} platform={platform} target={target}"
-    fmt_compiler = "{%compiler.name}"
+    fmt = "{name}{@version} platform={platform} target={target} {%compiler.name}"
 
     # Define format function based on whether Python version should be included
     if python:
 
         def fmt_spec(s):
-            return f"{s.format(fmt_base)} ^python@{s.dependencies('python')[0].version} {s.format(fmt_compiler)}"
+            return f"{s.format(fmt)} ^python@{s.dependencies('python')[0].version}"
     else:
 
         def fmt_spec(s):
-            return f"{s.format(fmt_base)} {s.format(fmt_compiler)}"
+            return s.format(fmt)
 
     mirror_info = [
         {
