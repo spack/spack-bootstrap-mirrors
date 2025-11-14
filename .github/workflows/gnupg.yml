@@ -48,8 +48,6 @@ jobs:
           path: spack-packages
           ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
       - name: Install gnupg
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           brew install gawk perl
 
@@ -66,13 +64,6 @@ jobs:
 
           spack install gnupg target=${{ matrix.runner[1] }}
           spack buildcache push --unsigned ./binary-mirror gnupg
-
-          spack mirror add \
-            --oci-username=${{ github.actor }} \
-            --oci-password-variable=GH_TOKEN \
-            ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2
-
-          spack buildcache push --unsigned ghcr gnupg
 
       - uses: actions/upload-artifact@v5
         with:
@@ -118,16 +109,6 @@ jobs:
       - run: |
           docker create --name gnupg-c --platform linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }}
           docker cp "gnupg-c:/root/binary-mirror" binary-mirror
-
-      - run: |
-          docker run -e GH_TOKEN=$GH_TOKEN ${{ steps.build.outputs.imageid }} \
-            /bin/bash -c "spack mirror add \
-              --oci-username=${{ github.actor }} \
-              --oci-password-variable=GH_TOKEN \
-              ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2 && \
-              spack buildcache push --unsigned ghcr gnupg"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v5
         with:
