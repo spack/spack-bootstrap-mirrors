@@ -24,7 +24,6 @@ jobs:
   manylinux2014_build:
     runs-on: "ubuntu-latest"
     strategy:
-      max-parallel: 1
       matrix:
         arch: ["amd64", "arm64", "ppc64le"]
     permissions:
