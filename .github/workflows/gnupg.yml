@@ -63,8 +63,9 @@ jobs:
 
           spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:256"
+          spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
 
-          spack install gnupg target=${{ matrix.runner[1] }}
+          spack install gnupg
           spack buildcache push --unsigned ./binary-mirror gnupg
 
           spack mirror add \
@@ -82,7 +83,6 @@ jobs:
   manylinux2014_build:
     runs-on: "ubuntu-latest"
     strategy:
-      max-parallel: 1
       matrix:
         arch: ["amd64", "arm64", "ppc64le"]
     permissions:

@@ -7,7 +7,6 @@ ENV PATH="/root/spack/bin/:$PATH" \
     SPACK_PYTHON=/opt/python/cp311-cp311/bin/python \
     PYTHONUNBUFFERED=1
 
-# Clone the repo and install Spack
 RUN mkdir /root/spack && \
     cd /root/spack && \
     git init . && \
@@ -24,6 +23,7 @@ RUN spack repo set --destination /root/spack-packages builtin
 RUN spack external find --not-buildable gawk perl
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
+RUN spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
 
-RUN spack install gnupg "target=$(spack arch --family --target)"
+RUN spack install gnupg
 RUN spack buildcache push --unsigned ./binary-mirror gnupg

@@ -12,7 +12,6 @@ ENV PATH="/root/spack/bin/:$PATH" \
     SPACK_PYTHON=/opt/python/cp311-cp311/bin/python \
     PYTHONUNBUFFERED=1
 
-# Clone the repo and install Spack
 RUN mkdir /root/spack && \
     cd /root/spack && \
     git init . && \
@@ -29,6 +28,7 @@ RUN spack repo set --destination /root/spack-packages builtin
 RUN spack external find bison cmake
 RUN spack compiler find
 RUN spack config add "config:install_tree:padded_length:256"
+RUN spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
 
 COPY clingo/install_clingo.py /root/install_clingo.py
 
