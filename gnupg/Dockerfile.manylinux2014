@@ -26,4 +26,5 @@ RUN spack config add "config:install_tree:padded_length:256"
 RUN spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
 
 RUN spack install gnupg
-RUN spack buildcache push --unsigned ./binary-mirror gnupg
+RUN spack buildcache push --unsigned --without-build-dependencies \
+      ./binary-mirror gnupg

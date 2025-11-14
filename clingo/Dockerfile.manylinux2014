@@ -38,5 +38,5 @@ RUN export PY_PATH=$(printf '%s' "$PYTHON_VERSION" | \
     awk -F. '{maj=$1; min=$2; suf=(maj*10+min<=37)?"m":""; printf "cp%d%d-cp%d%d%s\n", maj, min, maj, min, suf}') \
     && SPACK_PYTHON=/opt/python/${PY_PATH}/bin/python3 spack python install_clingo.py
 
-RUN spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
-
+RUN spack buildcache push --unsigned --without-build-dependencies \
+      ./binary-mirror clingo-bootstrap
