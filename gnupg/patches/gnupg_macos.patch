@@ -1,7 +1,7 @@
 diff --git a/var/spack/repos/builtin/packages/gnupg/package.py b/var/spack/repos/builtin/packages/gnupg/package.py
 index 859389b850..a6d00f2884 100644
---- a/var/spack/repos/builtin/packages/gnupg/package.py
-+++ b/var/spack/repos/builtin/packages/gnupg/package.py
+--- a/repos/spack_repo/builtin/packages/gnupg/package.py
++++ b/repos/spack_repo/builtin/packages/gnupg/package.py
 @@ -85,6 +85,7 @@ def configure_args(self):
              f"--with-zlib={self.spec['zlib-api'].prefix}",
              "--without-tar",
@@ -12,8 +12,8 @@ index 859389b850..a6d00f2884 100644
          if self.spec.satisfies("@2:"):
 diff --git a/var/spack/repos/builtin/packages/libgpg-error/package.py b/var/spack/repos/builtin/packages/libgpg-error/package.py
 index 6b78a25423..e1e905fd9b 100644
---- a/var/spack/repos/builtin/packages/libgpg-error/package.py
-+++ b/var/spack/repos/builtin/packages/libgpg-error/package.py
+--- a/repos/spack_repo/builtin/packages/libgpg_error/package.py
++++ b/repos/spack_repo/builtin/packages/libgpg_error/package.py
 @@ -51,6 +51,8 @@ def configure_args(self):
              "--enable-static",
              "--enable-shared",

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-    tags:        
+    tags:
       - v0.**
   pull_request:
     branches:
@@ -21,7 +21,7 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-  macos_gnupg:
+  macos_build:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
       # List of:
@@ -30,8 +30,8 @@ jobs:
       # 3. macOS deployment target
       matrix:
         runner: [
-          ["macos-13", "x86_64", "10.13"],  # highsierra
-          ["macos-14", "aarch64", "11"]     # bigsur
+          ["macos-15-intel", "x86_64", "11"],
+          ["macos-15", "aarch64", "11"],
         ]
     env:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[2] }}
@@ -41,98 +41,108 @@ jobs:
         with:
           repository: spack/spack
           path: spack
-          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
+          ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack-packages
+          path: spack-packages
+          ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
       - name: Install gnupg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           brew install gawk perl
 
           # Disables internationalization to avoid linking to
           # libintl on MacOS, since that will make the binary
           # non portable
-          git -C spack apply "$PWD/gnupg/patches/gnupg_macos.patch"
+          git -C spack-packages apply "$PWD/gnupg/patches/gnupg_macos.patch"
 
           . spack/share/spack/setup-env.sh
+          spack repo set --destination "$PWD/spack-packages" builtin
+
           spack external find --not-buildable gawk perl
           spack config add "config:install_tree:padded_length:256"
+          spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
 
-          spack install gnupg target=${{ matrix.runner[1] }}
+          spack install gnupg
           spack buildcache push --unsigned ./binary-mirror gnupg
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v5
         with:
-          name: gnupg_binary_mirror
+          name: gnupg_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.runner[1] }}
           path: binary-mirror
 
-  manylinux2014:
-    runs-on: ["self-hosted", "Linux"]
-    outputs:
-      spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
-
+  manylinux2014_build:
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        arch: ["amd64", "arm64", "ppc64le"]
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
-
-      # Setup tags to be used for docker images
-      - uses: docker/metadata-action@v5
-        id: docker_meta
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014
-
-      # Login to Github Packages
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: docker/setup-qemu-action@v3
-        id: qemu
+        if: ${{ matrix.arch != 'amd64' }}
         with:
-          platforms: linux/ppc64le,linux/arm64,linux/amd64
+          platforms: linux/${{ matrix.arch }}
 
       - uses: docker/setup-buildx-action@v3
 
-      # Build and eventually push to registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
       - uses: docker/build-push-action@v5
+        id: build
         with:
           file: ./gnupg/Dockerfile.manylinux2014
-          platforms: linux/arm64,linux/ppc64le,linux/amd64
-          pull: ${{ github.event_name == 'pull_request' }}
-          cache-from: |
-            ghcr.io/${{ github.repository_owner }}/gnupg_manylinux2014:main
-            ${{ steps.docker_meta.outputs.tags }}
+          platforms: linux/${{ matrix.arch }}
+          tags: ghcr.io/${{ github.repository }}/gnupg-build:${{ matrix.arch }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/gnupg-build:${{ matrix.arch }}
           cache-to: type=inline
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          load: true
 
-  upload-manylinux2014:
-    runs-on: ubuntu-latest
-    needs: [ manylinux2014 ]
-    env:
-      SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
+      - run: |
+          docker create --name gnupg-c --platform linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }}
+          docker cp "gnupg-c:/root/binary-mirror" binary-mirror
 
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v5
         with:
-          name: gnupg_binary_mirror
+          name: gnupg_binary_mirror-linux-${{ matrix.arch }}
           path: binary-mirror
 
   gnupg_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_gnupg ]
+    needs: [ macos_build, manylinux2014_build ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: spack/spack
           path: spack
-          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
-      - uses: actions/download-artifact@v3
+          ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      - uses: actions/checkout@v4
         with:
-          name: gnupg_binary_mirror
-      - run: ./spack/bin/spack python ./generate_bootstrap_json.py gnupg
-      - uses: actions/upload-artifact@v3
+          repository: spack/spack-packages
+          path: spack-packages
+          ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
+      - uses: actions/download-artifact@v6
+      - run: |
+          . spack/share/spack/setup-env.sh
+          spack repo set --destination "$PWD/spack-packages" builtin
+          spack python ./generate_bootstrap_json.py gnupg
+      - uses: actions/upload-artifact/merge@v5
+        with:
+          name: gnupg_combined
+          pattern: gnupg_binary_mirror-*
+          delete-merged: true
+      - uses: actions/upload-artifact@v5
         with:
           name: gnupg_manifest
           path: gnupg.json

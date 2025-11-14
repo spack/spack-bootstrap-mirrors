@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-    tags:        
+    tags:
       - v0.**
   pull_request:
     branches:
@@ -21,18 +21,18 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-  macos_clingo:
+  macos_build:
     runs-on: ${{ matrix.runner[0] }}
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         # runner + macOS deployment target
-        runner: [["macos-13", "10.13"], ["macos-14", "11"]]
-        exclude:
-        - python-version: "3.6"
-          runner: ["macos-14", "11"]
-        - python-version: "3.7"
-          runner: ["macos-14", "11"]
+        # we do not need to target multiple os releases of
+        # macos but use two here for x86 and aarch64 compatibly
+        runner: [["macos-15-intel", "11"], ["macos-14", "11"]]
+    permissions:
+      contents: read
+      packages: write
     env:
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.runner[1] }}
     steps:
@@ -41,7 +41,12 @@ jobs:
         with:
           repository: spack/spack
           path: spack
-          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
+          ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      - uses: actions/checkout@v4
+        with:
+          repository: spack/spack-packages
+          path: spack-packages
+          ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
       # See https://github.com/actions/setup-python/issues/960
       - name: Workaround for broken Python versions from setup-python
         run: brew install gettext zlib
@@ -49,94 +54,105 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install clingo-bootstrap
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip install --upgrade pip
           brew install bison
           export PATH="$(brew --prefix bison):$PATH"
           . spack/share/spack/setup-env.sh
-          spack external find --not-buildable cmake bison
+
+          spack repo set --destination "$PWD/spack-packages" builtin
           spack config add "config:install_tree:padded_length:256"
+          spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
+          spack external find cmake bison
 
           spack python clingo/install_clingo.py
           spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v5
         with:
-          name: clingo_binary_mirror
+          name: clingo_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.python-version }}
           path: binary-mirror
 
 
-  manylinux2014:
-    runs-on: ["self-hosted", "Linux"]
-    outputs:
-      spack_manylinux_tag: ${{ fromJSON(steps.docker_meta.outputs.json).tags[0] }}
+  manylinux2014_build:
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        arch: ["amd64", "arm64", "ppc64le"]
     permissions:
+      contents: read
       packages: write
-
     steps:
       - uses: actions/checkout@v4
-
-      # Setup tags to be used for docker images
-      - uses: docker/metadata-action@v5
-        id: docker_meta
+      - uses: docker/setup-qemu-action@v3
+        if: ${{ matrix.arch != 'amd64' }}
         with:
-          images: ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014
+          platforms: linux/${{ matrix.arch }}
 
-      # Login to Github Packages
+      - uses: docker/setup-buildx-action@v3
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
-      - uses: docker/setup-qemu-action@v3
-        id: qemu
-        with:
-          platforms: linux/ppc64le,linux/arm64
+      - if: ${{ matrix.python-version == '3.14' }}
+        run: echo "BASE_IMAGE=quay.io/pypa/manylinux2014:2025.11.11-1" >> $GITHUB_ENV
+      - if: ${{ matrix.python-version != '3.14' }}
+        run: echo "BASE_IMAGE=ghcr.io/spack/manylinux2014:v2024-10-16" >> $GITHUB_ENV
 
-      - uses: docker/setup-buildx-action@v3
-
-      # Build and eventually push to registry
       - uses: docker/build-push-action@v5
+        id: build
         with:
           file: ./clingo/Dockerfile.manylinux2014
-          platforms: linux/arm64,linux/ppc64le,linux/amd64
-          cache-from: |
-            ghcr.io/${{ github.repository_owner }}/clingo_manylinux2014:main
-            ${{ steps.docker_meta.outputs.tags }}
+          platforms: linux/${{ matrix.arch }}
+          tags: ghcr.io/${{ github.repository }}/clingo-build:py${{ matrix.python-version }}-${{ matrix.arch }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/clingo-build:py${{ matrix.python-version }}-${{ matrix.arch }}
           cache-to: type=inline
-          pull: ${{ github.event_name == 'pull_request' }}
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          load: true
+          build-args: |
+            BASE_IMAGE=${{ env.BASE_IMAGE }}
+            PYTHON_VERSION=${{ matrix.python-version }}
 
-  upload-manylinux2014:
-    runs-on: ubuntu-latest
-    needs: [ manylinux2014 ]
-    env:
-      SPACK_MANYLINUX2014_TAG: ${{ needs.manylinux2014.outputs.spack_manylinux_tag }}
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./copy_mirror_manylinux2014.sh
-      - uses: actions/upload-artifact@v3
+      - run: |
+          docker create --name clingo-c --platform linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }}
+          docker cp "clingo-c:/root/binary-mirror" binary-mirror
+
+      - uses: actions/upload-artifact@v5
         with:
-          name: clingo_binary_mirror
+          name: clingo_binary_mirror-linux-${{ matrix.arch }}-${{ matrix.python-version }}
           path: binary-mirror
 
   clingo_json:
     runs-on: ubuntu-latest
-    needs: [ upload-manylinux2014, macos_clingo ]
+    needs: [ macos_build, manylinux2014_build ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: spack/spack
           path: spack
-          ref: d36452cf4e70fa1da8b9db43921850872b82ced9
-      - uses: actions/download-artifact@v3
+          ref: 734c5db2121b01c373eed6538e452f18887e9e44
+      - uses: actions/checkout@v4
         with:
-          name: clingo_binary_mirror
-      - run: ./spack/bin/spack python ./generate_bootstrap_json.py clingo
-      - uses: actions/upload-artifact@v3
+          repository: spack/spack-packages
+          path: spack-packages
+          ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
+      - uses: actions/download-artifact@v6
+      - uses: actions/upload-artifact/merge@v5
+        with:
+          name: clingo_combined
+          pattern: clingo_binary_mirror-*
+          delete-merged: true
+      - run: |
+          . spack/share/spack/setup-env.sh
+          spack repo set --destination "$PWD/spack-packages" builtin
+          spack python ./generate_bootstrap_json.py clingo
+      - uses: actions/upload-artifact@v5
         with:
           name: clingo_manifest
           path: clingo.json
