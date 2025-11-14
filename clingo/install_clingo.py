@@ -13,5 +13,5 @@ if __name__ == "__main__":
             f"{spack.bootstrap.config.spec_for_current_python()}"
         )
         install(
-            f"clingo-bootstrap@spack +optimized ~docs target={spack.vendor.archspec.cpu.host().family} %mimalloc target={spack.vendor.archspec.cpu.host().family}"
+            f"clingo-bootstrap@spack +optimized ~docs target={spack.vendor.archspec.cpu.host().family} %[when='platform=linux']mimalloc target={spack.vendor.archspec.cpu.host().family}"
         )
