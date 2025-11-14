@@ -72,7 +72,7 @@ jobs:
           spack mirror add \
             --oci-username=${{ github.actor }} \
             --oci-password-variable=GH_TOKEN \
-            ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2.1
+            ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2.2
 
           spack buildcache push --unsigned ghcr clingo-bootstrap
 
@@ -134,7 +134,7 @@ jobs:
             /bin/bash -c "spack mirror add \
               --oci-username=${{ github.actor }} \
               --oci-password-variable=GH_TOKEN \
-              ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2.1 && \
+              ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2.2 && \
               spack buildcache push --unsigned ghcr clingo-bootstrap"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
