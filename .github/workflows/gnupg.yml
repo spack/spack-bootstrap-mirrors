@@ -70,7 +70,7 @@ jobs:
           spack mirror add \
             --oci-username=${{ github.actor }} \
             --oci-password-variable=GH_TOKEN \
-            ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2
+            ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2.1
 
           spack buildcache push --unsigned ghcr gnupg
 
@@ -124,7 +124,7 @@ jobs:
             /bin/bash -c "spack mirror add \
               --oci-username=${{ github.actor }} \
               --oci-password-variable=GH_TOKEN \
-              ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2 && \
+              ghcr oci://ghcr.io/spack/bootstrap-buildcache-v2.1 && \
               spack buildcache push --unsigned ghcr gnupg"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
