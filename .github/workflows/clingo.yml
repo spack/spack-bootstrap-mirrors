@@ -67,7 +67,8 @@ jobs:
           spack external find cmake bison
 
           spack python clingo/install_clingo.py
-          spack buildcache push --unsigned ./binary-mirror clingo-bootstrap
+          spack buildcache push --unsigned --without-build-dependencies \
+            ./binary-mirror clingo-bootstrap
 
       - uses: actions/upload-artifact@v5
         with:

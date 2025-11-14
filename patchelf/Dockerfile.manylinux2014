@@ -25,4 +25,5 @@ RUN spack config add "config:install_tree:padded_length:256"
 RUN spack config add "packages:all:prefer:[target=$(spack arch --family --target)]"
 
 RUN spack install patchelf
-RUN spack buildcache push --unsigned ./binary-mirror patchelf
+RUN spack buildcache push --unsigned --without-build-dependencies \
+      ./binary-mirror patchelf
