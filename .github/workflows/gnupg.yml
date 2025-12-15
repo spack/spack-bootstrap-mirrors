@@ -132,7 +132,7 @@ jobs:
           repository: spack/spack-packages
           path: spack-packages
           ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
       - run: |
           . spack/share/spack/setup-env.sh
           spack repo set --destination "$PWD/spack-packages" builtin
