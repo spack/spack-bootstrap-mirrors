@@ -142,7 +142,7 @@ jobs:
           repository: spack/spack-packages
           path: spack-packages
           ref: a5b98e6b7e411a499f310e048c1d2e39d1004519
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
       - uses: actions/upload-artifact/merge@v5
         with:
           name: clingo_combined
