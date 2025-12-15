@@ -68,7 +68,7 @@ jobs:
           spack install gnupg
           spack buildcache push --unsigned ./binary-mirror gnupg
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: gnupg_binary_mirror-${{ matrix.runner[0] }}-${{ matrix.runner[1] }}
           path: binary-mirror
@@ -112,7 +112,7 @@ jobs:
           docker create --name gnupg-c --platform linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }}
           docker cp "gnupg-c:/root/binary-mirror" binary-mirror
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: gnupg_binary_mirror-linux-${{ matrix.arch }}
           path: binary-mirror
@@ -137,12 +137,12 @@ jobs:
           . spack/share/spack/setup-env.sh
           spack repo set --destination "$PWD/spack-packages" builtin
           spack python ./generate_bootstrap_json.py gnupg
-      - uses: actions/upload-artifact/merge@v5
+      - uses: actions/upload-artifact/merge@v6
         with:
           name: gnupg_combined
           pattern: gnupg_binary_mirror-*
           delete-merged: true
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: gnupg_manifest
           path: gnupg.json
