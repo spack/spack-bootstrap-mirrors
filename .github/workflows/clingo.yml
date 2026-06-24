@@ -86,6 +86,8 @@ jobs:
           arch: "riscv64"
         - python-version: '3.7'
           arch: "riscv64"
+        - python-version: '3.8'
+          arch: "riscv64"
     permissions:
       contents: read
       packages: write
