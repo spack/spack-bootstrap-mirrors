@@ -80,7 +80,14 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        arch: ["amd64", "arm64", "ppc64le"]
+        arch: ["amd64", "arm64", "ppc64le", "riscv64"]
+        exclude:
+        - python-version: '3.6'
+          arch: "riscv64"
+        - python-version: '3.7'
+          arch: "riscv64"
+        - python-version: '3.8'
+          arch: "riscv64"
     permissions:
       contents: read
       packages: write
@@ -99,10 +106,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - if: ${{ matrix.python-version == '3.14' }}
-        run: echo "BASE_IMAGE=quay.io/pypa/manylinux2014:2025.11.11-1" >> $GITHUB_ENV
-      - if: ${{ matrix.python-version != '3.14' }}
+      - if: ${{ matrix.arch != 'riscv64' && matrix.python-version != '3.14' }}
         run: echo "BASE_IMAGE=ghcr.io/spack/manylinux2014:v2024-10-16" >> $GITHUB_ENV
+      - if: ${{ matrix.arch != 'riscv64' && matrix.python-version == '3.14' }}
+        run: echo "BASE_IMAGE=quay.io/pypa/manylinux2014:2025.11.11-1" >> $GITHUB_ENV
+      - if: ${{ matrix.arch == 'riscv64' }}
+        run: echo "BASE_IMAGE=ghcr.io/spack/manylinux_2_39:pr-2" >> $GITHUB_ENV
 
       - uses: docker/build-push-action@v5
         id: build
